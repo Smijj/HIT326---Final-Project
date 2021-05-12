@@ -3,8 +3,8 @@
 class Database {
     private static $conn = null;
     private $db_host = 'localhost';
-    private $db_name = '';
-    private $db_user = '';
+    private $db_name = 'aat_database';
+    private $db_user = 'root';
     private $db_pwd = '';
 
     /**
