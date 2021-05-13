@@ -54,11 +54,11 @@ get("/signup", function($app) {
     $lname = $app->form('lname');
     $perm = $app->form('perm');
     // ===== Need to add some kind of proper filter maybe: filter_input()?
-    if ($app->get_method("get")) {
+    if ($app->get_method() == "get") {
         $app->render("blank", "signup");
         exit();
     }
-    if ( $_SERVER["REQUEST_METHOD"] == "POST"/* && !($email && $pwd && $pwd_conf && $fname && $lname && $perm)*/) {
+    if ($app->get_method() == "post" && !($email && $pwd && $pwd_conf && $fname && $lname && $perm)) {
         $app->set_flash("Please fill all fields.");
         $app->render("blank", "signup");
         exit();
