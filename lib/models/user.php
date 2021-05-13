@@ -1,6 +1,6 @@
 <?php
 
-class Users extends Database {
+class User extends Database {
     
     /**
      * Checks whether a valid user session is active.
