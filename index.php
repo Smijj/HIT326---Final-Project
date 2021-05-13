@@ -27,8 +27,8 @@ get("/", function($app) {
 });
 
 get("/login", function($app){
-    $email = $_POST['email'];
-    $pwd = $_POST['pwd'];
+    $email = $app->form('email');
+    $pwd = $app->form('pwd');
     if ($email && $pwd) {
         require MODELS."users.php";
         $user = new Users;
@@ -44,4 +44,41 @@ get("/login", function($app){
     } else {
         $app->render("blank", "login");
     }
+});
+
+get("/signup", function($app) {
+    $email = $app->form('email');
+    $pwd = $app->form('pwd');
+    $pwd_conf = $app->form('pwdConf');
+    $fname = $app->form('fname');
+    $lname = $app->form('lname');
+    $perm = $app->form('perm');
+    // ===== Need to add some kind of proper filter maybe: filter_input()?
+    if ($app->get_method("get")) {
+        $app->render("blank", "signup");
+        exit();
+    }
+    if ( $_SERVER["REQUEST_METHOD"] == "POST"/* && !($email && $pwd && $pwd_conf && $fname && $lname && $perm)*/) {
+        $app->set_flash("Please fill all fields.");
+        $app->render("blank", "signup");
+        exit();
+    } else {
+        if ($pwd === $pwd_conf){
+            $user = new Users;
+            try {
+                $user->registerUser($email, $fname, $lname, $pwd, $perm);
+                $app->set_flash("Success");
+                $app->render(LAYOUT, "mainpage");
+            } catch (Exception $e) {
+                $app->set_flash("Error: ".$e->getMessage());
+                $app->render("blank", "signup");
+            }
+            exit();
+        } else {
+            $app->set_flash("Passwords do not match");
+            $app->render("blank", "signup");
+            exit();
+        }
+    }
+    $app->render("blank", "signup");
 });

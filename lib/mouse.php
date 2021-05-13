@@ -114,10 +114,10 @@ class Mouse{
 
        $flash = $this->get_flash();
 
-       $content = VIEWS."/partials/{$content}.php";
+       $content = VIEWS."templates/{$content}.php";
 
        if(!empty($layout)){
-          require VIEWS."/templates/{$layout}.layout.php";
+          require VIEWS."templates/{$layout}.layout.php";
        }
        else{
           // What is this part for? When would we not need a layout? Think about it.
