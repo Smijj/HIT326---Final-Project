@@ -4,7 +4,7 @@ ini_set('display_errors','On');
 error_reporting(E_ERROR | E_PARSE);
 
 /* Set the path to the framework folder */
-DEFINE("LIB",$_SERVER['DOCUMENT_ROOT']."htdocs/lib/");
+DEFINE("LIB",$_SERVER['DOCUMENT_ROOT']."/lib/");
 
 /* SET VIEW paths */
 DEFINE("VIEWS",LIB."views/");
@@ -21,3 +21,23 @@ DEFINE("LAYOUT","standard");
 
 /* Start the Mouse application */
 require MOUSE;
+
+get("/login", function($app){
+    if (!empty($_POST['email']) && !empty($_POST['pwd'])) {
+        require MODELS."users.php";
+        $email = $_POST['email'];
+        $pwd = $_POST['pwd'];
+        $user = new Users;
+        try {
+            if ($user->sign_in($email, $pwd)) {
+                $app->render(LAYOUT, "");
+            }
+        } catch (Exception $e) {
+            $app->set_flash("ERROR: ", $e->getMessage());
+            $app->set_message("email", $email);
+            $app->render("login", null);
+        }
+    } else {
+        $app->render("blank", "login");
+    }
+});
