@@ -7,6 +7,11 @@
     <title><?php if (!empty($title)) { echo $title; } ?></title>
 </head>
 <body>
+    <header>
+        <div class="login">
+            <a href="/login"><input type="button" value="Sign-in"/></a>
+        </div>
+    </header>
     <?php if (!empty($bodyFilePath)) { include $bodyFilePath; } ?>
 </body>
 </html>

@@ -22,15 +22,19 @@ DEFINE("LAYOUT","standard");
 /* Start the Mouse application */
 require MOUSE;
 
+get("/", function($app) {
+    $app->render(LAYOUT, "mainpage");
+});
+
 get("/login", function($app){
-    if (!empty($_POST['email']) && !empty($_POST['pwd'])) {
+    $email = $_POST['email'];
+    $pwd = $_POST['pwd'];
+    if ($email && $pwd) {
         require MODELS."users.php";
-        $email = $_POST['email'];
-        $pwd = $_POST['pwd'];
         $user = new Users;
         try {
             if ($user->sign_in($email, $pwd)) {
-                $app->render(LAYOUT, "");
+                $app->render(LAYOUT, "main");
             }
         } catch (Exception $e) {
             $app->set_flash("ERROR: ", $e->getMessage());

@@ -183,7 +183,14 @@ class Mouse{
  
        return "GET";
     }
-
+    
+    /**
+     * Gets value from $_POST
+     * 
+     * @param string $key [explicite description]
+     *
+     * @return string Returns false if key not found
+     */
     public function form($key){
        if(!empty($_POST[$key])){
           return $_POST[$key];
