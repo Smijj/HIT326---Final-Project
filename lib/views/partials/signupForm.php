@@ -1,9 +1,12 @@
 <label for="fname">First Name:</label>
-<input type="text" name="fname" id="fname" value="<?php if (!empty($fname)) { echo $fname; } ?>"><br>
+<input type="text" name="fname" id="fname" value="<?php if (!empty($fname)) { echo $fname; } ?>" autocomplete="given-name"><br>
 <label for="lname">Last name</label>
-<input type="text" name="lname" id="lname" value="<?php if (!empty($lname)) { echo $lname; } ?>"><br>
-<?php include PARTIALS."loginForm.php"; ?>
+<input type="text" name="lname" id="lname" value="<?php if (!empty($lname)) { echo $lname; } ?>" autocomplete="family-name"><br>
+<label for="email">Email:</label>
+<input type="email" name="email" id="email" value="<?php if (!empty($email)) {echo $email;} ?>" autocomplete="email"><br>
+<label for="pwd">Password:</label>
+<input type="password" name="pwd" id="pwd" autocomplete="new-password"><br>
 <label for="pwdConf">Confirm password</label>
-<input type="password" name="pwdConf" id="pwdConf"/><br>
+<input type="password" name="pwdConf" id="pwdConf" autocomplete="new-password"/><br>
 <label for="perm">Permission Level:</label>
-<input type="text" name="perm" id="prem" value="<?php if (!empty($perm)) { echo $perm; } ?>"><br>
+<input type="text" name="perm" id="prem"><br>

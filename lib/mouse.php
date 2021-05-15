@@ -105,103 +105,116 @@ class Mouse{
         return $this->route_variables[$key];
     }
     
-    public function render($layout, $content){
+   public function render($layout, $content){
 
-       foreach($this->messages As $key => $val){
-            $$key = $val;
-       }
-       
+      foreach($this->messages As $key => $val){
+         $$key = $val;
+      }
+      
 
-       $flash = $this->get_flash();
+      $flash = $this->get_flash();
 
-       $content = VIEWS."templates/{$content}.php";
+      $content = VIEWS."templates/{$content}.php";
 
-       if(!empty($layout)){
-          require VIEWS."templates/{$layout}.layout.php";
-       }
-       else{
-          // What is this part for? When would we not need a layout? Think about it.
-       }
-       exit();
-    }
+      if(!empty($layout)){
+         require VIEWS."templates/{$layout}.layout.php";
+      }
+      else {
+         // What is this part for? When would we not need a layout? Think about it.
+      }
+      exit();
+   }
 
-    public function get_request(){
+   public function get_request(){
       return $_SERVER['REQUEST_URI'];
-    }
+   }
     
-    public function is_https(){
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on'){
-            return true;
-        }
-        return false;
-    }
+   public function is_https(){
+      if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on'){
+         return true;
+      }
+      return false;
+   }
 
-    public function force_to_https($path="/"){
-        if(!$this->is_https()){
-           $host = $_SERVER['HTTP_HOST'];
-           $redirect_to_path = "https://".$host.$path;
-           $this->redirect_to($redirect_to_path);
-           exit();
-        }
-    }
+   public function force_to_https($path="/"){
+      if(!$this->is_https()){
+         $host = $_SERVER['HTTP_HOST'];
+         $redirect_to_path = "https://".$host.$path;
+         $this->redirect_to($redirect_to_path);
+         exit();
+      }
+   }
 
-    public function force_to_http($path="/"){
-        if($this->is_https()){
-           $host = $_SERVER['HTTP_HOST'];
-           $redirect_to_path = "http://".$host.$path;
-           $this->redirect_to($redirect_to_path);
-           exit();
-        }
-    }
+   public function force_to_http($path="/"){
+      if($this->is_https()){
+         $host = $_SERVER['HTTP_HOST'];
+         $redirect_to_path = "http://".$host.$path;
+         $this->redirect_to($redirect_to_path);
+         exit();
+      }
+   }
 
-    public function get_method(){
-       $request_method = "GET";
-       
-       if(!empty($_SERVER['REQUEST_METHOD'])){
-             $request_method = strtoupper($_SERVER['REQUEST_METHOD']);
-       }
-              
-       if($request_method === "POST"){
-           if(strtoupper($this->form("_method")) === "POST"){
-              return "POST";
-           }
-           if(strtoupper($this->form("_method")) === "PUT"){
-              return "PUT";
-           }
-           if(strtoupper($this->form("_method")) === "DELETE"){
-              return "DELETE";
-           }   
-          return "POST";
-       }
-       if($request_method === "PUT"){
+   public function get_method(){
+      $request_method = "GET";
+      
+      if(!empty($_SERVER['REQUEST_METHOD'])){
+         $request_method = strtoupper($_SERVER['REQUEST_METHOD']);
+      }
+            
+      if($request_method === "POST"){
+         if(strtoupper($this->form("_method")) === "POST"){
+            return "POST";
+         }
+         if(strtoupper($this->form("_method")) === "PUT"){
             return "PUT";
-       }
-
-       if($request_method === "DELETE"){
+         }
+         if(strtoupper($this->form("_method")) === "DELETE"){
             return "DELETE";
-       }           
- 
-       return "GET";
-    }
-    
-    /**
-     * Gets value from $_POST
-     * 
-     * @param string $key [explicite description]
-     *
-     * @return string Returns false if key not found
-     */
-    public function form($key){
-       if(!empty($_POST[$key])){
-          return $_POST[$key];
-       }
-       return false;
-    }
+         }   
+         return "POST";
+      }
+      if($request_method === "PUT"){
+         return "PUT";
+      }
 
-    public function redirect_to($path="/"){
-       header("Location: {$path}");
-       exit();
-    }
+      if($request_method === "DELETE"){
+         return "DELETE";
+      }           
+
+      return "GET";
+   }
+    
+   /**
+    * Gets sanitised value from $_POST[]
+    *
+    * Data types:
+    *
+    * str, email
+    * 
+    * @param string $key Key of value to return.
+    * @param string $datatype Specify type of data.
+    *
+    * @return string Returns false if key not found.
+    */
+   public function form($key, $datatype = ""){
+      if(!empty($_POST[$key])){
+         switch ($datatype) {
+            case "email":
+                  $value = filter_input(INPUT_POST, $key, FILTER_SANITIZE_EMAIL);
+               break;
+            default:
+               $value = sanitise_str($_POST[$key]);
+               break;
+         }
+         return $value;
+      }
+      return false;
+   }
+
+   public function redirect_to($path="/"){
+      header("Location: {$path}");
+      exit();
+   }
 
     public function set_session_message($key,$message){
        if(!empty($key) && !empty($message)){
@@ -223,7 +236,13 @@ class Mouse{
        }
        return $msg;
     }
-
+    
+    /**
+     * Sets the message 'flash' to the given value.
+     *
+     * @param  mixed $msg
+     * @return void
+     */
     public function set_flash($msg){
           $this->set_session_message("flash",$msg);
     }

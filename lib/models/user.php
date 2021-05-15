@@ -4,16 +4,17 @@ class User extends Database {
     
     /**
      * Checks whether a valid user session is active.
+     * May throw an Exception on DB error.
      *
-     * @return bool returns **true** on success and throws and **Exception** on failure.
+     * @return bool returns **true** on success and **false** on failure.
      */
     public function is_authenticated() {
         $id = "";
         $hash="";
 
         session_start();
-        if(!empty($_SESSION["id"]) && !empty($_SESSION["hash"])) {
-           $id = $_SESSION["id"];
+        if(!empty($_SESSION["uid"]) && !empty($_SESSION["hash"]) && !empty($_SESSION['perm'])) {
+           $id = $_SESSION["uid"];
            $hash = $_SESSION["hash"];
         }
         session_write_close();
@@ -21,22 +22,22 @@ class User extends Database {
         if(!empty($id) && !empty($hash)) {
 
             try{
-               $query = "SELECT hashed_password FROM users WHERE id=?";
+               $query = "SELECT pwd FROM users WHERE user_id=?";
                if($statement = $this->prepare($query)){
                     $binding = array($id);
                     if(!$statement -> execute($binding)){
                     return false;
                     } else {
                         $result = $statement->fetch(PDO::FETCH_ASSOC);
-                        if($result['hashed_password'] === $hash){
-                        return true;
+                        if($result['pwd'] === $hash){
+                            return true;
                         }
                     }
                }
 
             }
             catch(Exception $e){
-                throw new Exception("Authentication not working properly. {$e->getMessage()}");
+                throw new Exception("Internal authentication issue, please try again later. {$e->getMessage()}");
             }
 
         }
@@ -85,9 +86,9 @@ class User extends Database {
         }
     
         // Set-up and execute a prepared sql statement to get all users with matching emails.
-        $sql = "SELECT uid FROM Users WHERE email=?";
+        $sql = "SELECT user_id FROM users WHERE email=?";
         $stmt = $this->prepare($sql);
-        $stmt->execute($email);
+        $stmt->execute(array($email));
     
         // If the count is 1 or more, the email is already in use.
         $count = $stmt->rowCount();
@@ -95,13 +96,13 @@ class User extends Database {
             throw new Exception('Username currently in use.');
         } else {
             // Hash password with pepper and salt.
-            $pwd_peppered = $this->generate_pepper_hash($pwd);
-            $pwd_hashed = password_hash($pwd_peppered, PASSWORD_DEFAULT);
+            // $pwd_peppered = $this->generate_pepper_hash($pwd);
+            $pwd_hashed = password_hash($pwd, PASSWORD_DEFAULT);
     
             // Set-up and execute a prepared sql statement to insert the new user into the database.
             $sql = "INSERT INTO Users (email, fname, lname, pwd, perm) VALUES (?, ?, ?, ?, ?)";
             $stmt = $this->prepare($sql);
-            if ($stmt->execute($email, $fname, $lname, $pwd_hashed, $perm)) {
+            if ($stmt->execute(array($email, $fname, $lname, $pwd_hashed, $perm))) {
                 return true;
             } else {
                 throw new Exception('Internal error when adding user. Please try again later.');
@@ -141,8 +142,7 @@ class User extends Database {
         try{
            $query = "DELETE FROM users WHERE user_id=?";
            if($statement = $this->prepare($query)) {
-              $binding = array($uid);
-              if(!$statement -> execute($binding)) {
+              if(!$statement -> execute(array($uid))) {
                     throw new Exception("Could not execute query.");
               } else {
                   return true;
@@ -164,8 +164,9 @@ class User extends Database {
      * @return string Hashed password with pepper added.
      */
     private function generate_pepper_hash($pwd):string {
-        $pepper = "HufNkGrBiLfVeCfSyu";
-        return hash_hmac("sha256", $pwd, $pepper);
+        return $pwd;
+        // $pepper = "HufNkGrBiLfVeCfSyu";
+        // return hash_hmac("sha256", $pwd, $pepper);
     }
     
     /**
@@ -182,9 +183,9 @@ class User extends Database {
                 throw new Exception("empty username or password.");
             } else {
                 // Get user with entered email.
-                $sql = "SELECT user_id, email, pwd, salt, perm FROM Users WHERE email=?";
+                $sql = "SELECT user_id, email, pwd, perm FROM users WHERE email=?";
                 $stmt = $this->prepare($sql);
-                $stmt->execute($email);
+                $stmt->execute(array($email));
 
                 // only if there is one matching user, continue to check pwd.
                 $count = $stmt->rowCount();
@@ -193,10 +194,10 @@ class User extends Database {
                     // Username exists.
                     // Check if paswords match.
                     $pwd_hashed = $row['pwd'];
-                    $pwd_peppered = $this->generate_pepper_hash($pwd_hashed);
-                    if (password_verify($pwd_peppered, $pwd_hashed)) {
+                    // $pwd_peppered = $this->generate_pepper_hash($pwd_hashed);
+                    if (password_verify($pwd, $pwd_hashed)) {
                         // Success
-                        $this->set_authenticated_session($row['uid'], $row['email'], $row['perm']);
+                        $this->set_authenticated_session($row['user_id'], $row['perm'], $row['pwd']);
                         return true;
                     } else {
                         throw new Exception('Invalid Username or Password');
@@ -232,7 +233,8 @@ class User extends Database {
      * Returns boolean depicting success of destory, and will always unset.
      * @return bool
      */
-    function logout(): bool {
+    function signout(): bool {
+        session_start();
         session_unset();
         return session_destroy();
     }

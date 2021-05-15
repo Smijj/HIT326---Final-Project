@@ -8,10 +8,17 @@
 </head>
 <body>
     <header>
-        <div class="login">
-            <a href="/login"><input type="button" value="Sign-in"/></a>
-        </div>
+    <?php
+        if (!empty($is_auth) && $is_auth === true) {
+            $btLocation = "/signout";
+            $btName = "sign out";
+        } else {
+            $btLocation = "/signin";
+            $btName = "sign in";
+        }
+        echo "<div class='login'><a href='{$btLocation}'><input type='button' value='{$btName}'/></a></div>";
+    ?>
     </header>
-    <?php if (!empty($bodyFilePath)) { include $bodyFilePath; } ?>
+    <?php if (!empty($content)) { require $content; } ?>
 </body>
 </html>
