@@ -223,8 +223,32 @@ class Mouse{
           session_write_close();
        }
     }
-
-    public function get_session_message($key){
+    
+    /**
+     * Returns value stored in $_SESSION[] given the **$key**.
+     *
+     * @param string $key
+     * @return string $value
+     */
+    public function get_session_message($key) {
+      $msg = "";
+      if(!empty($key) && is_string($key)){
+         session_start();
+         if(!empty($_SESSION[$key])){
+            $msg = $_SESSION[$key];
+         }
+         session_write_close();
+      }
+      return $msg;
+    }
+    
+    /**
+     * Pops value stored in $_SESSION[] given the **$key**.
+     *
+     * @param string $key
+     * @return string $value
+     */
+    public function pop_session_message($key){
        $msg = "";
        if(!empty($key) && is_string($key)){
           session_start();
@@ -248,7 +272,7 @@ class Mouse{
     }
 
     public function get_flash(){
-          return $this->get_session_message("flash");   
+          return $this->pop_session_message("flash");   
     }
     
 

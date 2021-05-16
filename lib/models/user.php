@@ -29,7 +29,7 @@ class User extends Database {
                     return false;
                     } else {
                         $result = $statement->fetch(PDO::FETCH_ASSOC);
-                        if($result['pwd'] === $hash){
+                        if($result !== false && $result['pwd'] === $hash){
                             return true;
                         }
                     }
@@ -163,11 +163,11 @@ class User extends Database {
      * @param  string $pwd password
      * @return string Hashed password with pepper added.
      */
-    private function generate_pepper_hash($pwd):string {
-        return $pwd;
-        // $pepper = "HufNkGrBiLfVeCfSyu";
-        // return hash_hmac("sha256", $pwd, $pepper);
-    }
+    // private function generate_pepper_hash($pwd):string {
+    //     // return $pwd;
+    //     $pepper = "HufNkGrBiLfVeCfSyu";
+    //     return hash_hmac("sha256", $pwd, $pepper);
+    // }
     
     /**
      * Validates sign in credentials from user.
@@ -183,7 +183,7 @@ class User extends Database {
                 throw new Exception("empty username or password.");
             } else {
                 // Get user with entered email.
-                $sql = "SELECT user_id, email, pwd, perm FROM users WHERE email=?";
+                $sql = "SELECT user_id, email, fname, lname, pwd, perm FROM users WHERE email=?";
                 $stmt = $this->prepare($sql);
                 $stmt->execute(array($email));
 
@@ -197,7 +197,7 @@ class User extends Database {
                     // $pwd_peppered = $this->generate_pepper_hash($pwd_hashed);
                     if (password_verify($pwd, $pwd_hashed)) {
                         // Success
-                        $this->set_authenticated_session($row['user_id'], $row['perm'], $row['pwd']);
+                        $this->set_authenticated_session($row['user_id'], $row['fname']." ".$row['lname'], $row['perm'], $row['pwd']);
                         return true;
                     } else {
                         throw new Exception('Invalid Username or Password');
@@ -212,16 +212,18 @@ class User extends Database {
     }
     
     /**
-     * set an authenticated session with 'uid', 'hash', 'perm', and 'LAST_ACTIVITY' session keys.
+     * set an authenticated session and session information.
      *
-     * @param  string $uid
-     * @param  string $perm
-     * @param  string $hash
+     * @param  string $uid Unique user identifier
+     * @param  string $name Full name
+     * @param  string $perm Permission level
+     * @param  string $hash Password hash
      * @return void
      */
-    private function set_authenticated_session($uid, $perm, $hash) {
+    private function set_authenticated_session($uid, $name, $perm, $hash) {
         session_start();
         $_SESSION['uid'] = $uid;
+        $_SESSION['name'] = $name;
         $_SESSION['hash'] = $hash;
         $_SESSION['perm'] = $perm;
         $_SESSION['LAST_ACTIVITY'] = time();
