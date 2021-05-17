@@ -211,22 +211,24 @@ post("/addarticle", function($app) {
             $username = $app->get_session_message("name");
             $app->set_message("username", $username);
             $title = $app->form("title");
+            $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
 
 
             // ===== Need to add some kind of proper filter maybe: filter_input()?
             $app->set_message("title", ($title != false) ? $title : "");
+            $app->set_message("keywords", ($keywords != false) ? $keywords : "");
             $app->set_message("article_content", ($article_content != false) ? $article_content : "");
 
 
-            if ($title === false || $article_content === false) {
+            if ($title === false || $keywords === false || $article_content === false) {
                 $app->set_flash("Please fill all fields.");
                 $app->render(LAYOUT, "addarticle");
                 exit();
             } else {
                 $article = new Article();
                 try {
-                    $article->registerArticle($author_id, $title, $article_content);
+                    $article->registerArticle($author_id, $title, $keywords, $article_content);
                     $app->set_flash("Success");
                     $app->redirect_to("/");
                 } catch (Exception $e) {
