@@ -154,3 +154,24 @@ get("/signout", function($app) {
         $app->redirect_to("/");
     }
 });
+
+
+//Article creation get request
+get("/article", function($app) {
+    $user = new user();
+    $is_auth = false;
+    try {
+        $is_auth = $user->is_authenticated();
+        $app->set_message("is_auth", $is_auth);
+        if ($is_auth) {
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
+        }
+    } catch (Exception $e) {
+        $app->set_flash($e->getMessage());
+        $app->render(LAYOUT, "mainpage");
+        exit();
+    }
+
+    $app->render(LAYOUT, "article");
+});
