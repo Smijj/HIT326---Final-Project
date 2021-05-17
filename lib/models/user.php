@@ -1,10 +1,30 @@
 <?php
 
+/**** Custom Exceptions ****/
+/**
+ * Exception handeling Database related errors.
+ */
+class DBException extends Exception{
+    public function __construct($message) {
+	    $message = "Internal error 001: ".$message;
+        parent::__construct($message, 0, null);
+    }
+}
+/**
+ * Exception handeling authentication errors.
+ */
+class AuthException extends Exception {
+    public function __construct($message) {
+        $message = "Internal Authentication error: ".$message;
+        parent::__construct($message, 0, null);
+    }
+}
+
 class User extends Database {
     
     /**
      * Checks whether a valid user session is active.
-     * May throw an Exception on DB error.
+     * May throw an DBException.
      *
      * @return bool returns **true** on success and **false** on failure.
      */
@@ -37,7 +57,7 @@ class User extends Database {
 
             }
             catch(Exception $e){
-                throw new Exception("Internal authentication issue, please try again later. {$e->getMessage()}");
+                throw new DBException("Please try again later. {$e->getMessage()}");
             }
 
         }
@@ -47,7 +67,7 @@ class User extends Database {
     /**
      * Returns an array of all users.
      *
-     * @return void returns an **array** if successful and throws an **Exception** on failure.
+     * @return mixed returns an **array** if successful and throws an **Exception** on DB failure.
      */
     public function get_users() {
         try {
@@ -60,7 +80,7 @@ class User extends Database {
                     return $results;
                 }
            } else {
-                throw new Exception("Could not prepare statement.");
+                throw new DBException("Could not prepare statement.");
             }
         } catch(Exception $e) {
             throw new Exception($e->getMessage());
@@ -239,5 +259,18 @@ class User extends Database {
         session_start();
         session_unset();
         return session_destroy();
+    }
+
+    public function is_db_empty) {
+        try {
+            $sql = "SELECT user_id FROM users";
+            if ($stmt = $this->prepare($sql)) {
+                if ($statement->execute()) {
+
+                } else {
+                    throw new 
+                }
+            }
+        }
     }
 }

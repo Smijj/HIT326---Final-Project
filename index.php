@@ -43,13 +43,15 @@ get("/", function($app) {
             $username = $app->get_session_message("name");  // if so, give the magepage their name.
             $app->set_message("username", $username);
         }
-    } catch (Exception $e) {
+    } catch (DBException $e) {
         $app->set_flash($e->getMessage());                  // Catch any error and display to user as flash.
-        $app->render(LAYOUT, "mainpage");                   // Render the magepage.
         exit();                                             // Ensure all code execution stops here.
+    } catch (Exception $e) {
+        $app->set_flash("Internal Error. Please try again later.");
+    } finally {
+        $app->render(LAYOUT, "mainpage");                       // Render the mainpage.
     }
 
-    $app->render(LAYOUT, "mainpage");                       // Render the mainpage.
 });
 
 get("/signin", function($app) {
@@ -169,7 +171,6 @@ get("/signout", function($app) {
 get("/article/:id", function($app) {
 
 });
-
 
 
 // If no valid URL matches are found, let teh application resolve the issue.
