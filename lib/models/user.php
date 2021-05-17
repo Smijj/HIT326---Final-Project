@@ -261,14 +261,14 @@ class User extends Database {
         return session_destroy();
     }
 
-    public function is_db_empty) {
+    public function is_db_empty() {
         try {
             $sql = "SELECT user_id FROM users";
             if ($stmt = $this->prepare($sql)) {
                 if ($statement->execute()) {
 
                 } else {
-                    throw new 
+                    // throw new 
                 }
             }
         }
