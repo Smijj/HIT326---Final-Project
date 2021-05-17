@@ -201,8 +201,6 @@ get("/addarticle", function($app) {
         $app->redirect_to("/");
         exit();
     }
-
-    
 });
 
 
@@ -222,22 +220,24 @@ post("/addarticle", function($app) {
             // $app->set_message("username", $username);
             navbar_init($app, $user, $is_auth);
             $title = $app->form("title");
+            $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
 
 
             // ===== Need to add some kind of proper filter maybe: filter_input()?
             $app->set_message("title", ($title != false) ? $title : "");
+            $app->set_message("keywords", ($keywords != false) ? $keywords : "");
             $app->set_message("article_content", ($article_content != false) ? $article_content : "");
 
 
-            if ($title === false || $article_content === false) {
+            if ($title === false || $keywords === false || $article_content === false) {
                 $app->set_flash("Please fill all fields.");
                 $app->render(LAYOUT, "addarticle");
                 exit();
             } else {
                 $article = new Article();
                 try {
-                    $article->registerArticle($author_id, $title, $article_content);
+                    $article->registerArticle($author_id, $title, $keywords, $article_content);
                     $app->set_flash("Success");
                     $app->redirect_to("/");
                 } catch (Exception $e) {
@@ -254,5 +254,29 @@ post("/addarticle", function($app) {
     } catch (Exception $e) {
         $app->set_flash($e->getMessage());
         $app->redirect_to("/");
+    }
+});
+
+//Display Edit Articles List
+get("/editarticleslist", function($app) {
+    $user = new user();
+    $is_auth = false;
+
+    try {
+        $is_auth = $user->is_authenticated();
+        $app->set_message("is_auth", $is_auth);
+        if ($is_auth) {
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
+            $app->render(LAYOUT, "editarticleslist");
+        } else {
+            $app->set_flash("You are not authorised");
+            $app->redirect_to("/");
+            exit();
+        }
+    } catch (Exception $e) {
+        $app->set_flash("Database error");
+        $app->redirect_to("/");
+        exit();
     }
 });
