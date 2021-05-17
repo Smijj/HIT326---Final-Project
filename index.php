@@ -168,15 +168,6 @@ get("/signout", function($app) {
     }
 });
 
-<<<<<<< HEAD
-get("/article/:id", function($app) {
-
-});
-
-
-// If no valid URL matches are found, let teh application resolve the issue.
-resolve();
-=======
 
 //Article creation get request
 get("/addarticle", function($app) {
@@ -256,4 +247,3 @@ post("/addarticle", function($app) {
         $app->redirect_to("/");
     }
 });
->>>>>>> 6b660bff440ac5d94645eb9fa72505c14f375f93
