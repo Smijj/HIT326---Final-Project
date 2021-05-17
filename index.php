@@ -84,8 +84,8 @@ get("/signup", function($app) {
     //     $user = new User();                              // Create new user class.
     //     $is_auth = $user->is_authenticated();            // get authentication status.
 
-    //     if ($is_auth) {                                  // Check if the user is authenticated.
-    //         if (!empty($_SESSION["perm"]) && $_SESSION["perm"] == 3) {       // Check if the user has the correct permission level to access the page.
+    //     if ($is_auth === true) {                                             // Check if the user is authenticated.
+    //         if ($app->get_session_message("perm") === 3) {                   // Check if the user has the correct permission level to access the page.
     //             // !==== User is authenticated to level two (admin/superuser/boss) ====!
     //             // !==== Place render here once an account has been made. ====!
     //         } else {
@@ -95,7 +95,7 @@ get("/signup", function($app) {
     //         }
     //     } else {
     //         $app->set_flash("Please log in to access this feature.");        // If user is not logged in redirect to 403 error.
-    //         $app->redirect_to("mainpage");
+    //         $app->redirect_to(LAYOUT, "404");
     //         exit();
     //     }
     // } catch (Exception $e) {
