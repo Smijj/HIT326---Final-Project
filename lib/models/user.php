@@ -271,6 +271,8 @@ class User extends Database {
                     // throw new 
                 }
             }
+        } catch (DBException $e) {
+            throw new DBException($e->getMessage());
         }
     }
 }
