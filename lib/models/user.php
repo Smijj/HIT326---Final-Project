@@ -265,10 +265,15 @@ class User extends Database {
         try {
             $sql = "SELECT user_id FROM users";
             if ($stmt = $this->prepare($sql)) {
-                if ($statement->execute()) {
-
+                if ($stmt->execute()) {
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    if (empty($result)) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 } else {
-                    // throw new 
+                    throw new DBException("Could not prepare statement.");
                 }
             }
         } catch (DBException $e) {
