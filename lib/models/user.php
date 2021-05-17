@@ -95,7 +95,7 @@ class User extends Database {
         if ($count > 0) {
             throw new Exception('Username currently in use.');
         } else {
-            // Hash password with pepper and salt.
+            // Hash password.
             // $pwd_peppered = $this->generate_pepper_hash($pwd);
             $pwd_hashed = password_hash($pwd, PASSWORD_DEFAULT);
     
