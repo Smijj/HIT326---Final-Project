@@ -3,8 +3,6 @@
 ini_set('display_errors','On');
 // error_reporting(E_ERROR | E_PARSE);
 
-
-/************************** CONFIGURE PATHS *************************************/
 /* Set the path to the framework folder */
 DEFINE("LIB",$_SERVER['DOCUMENT_ROOT']."/lib/");
 
@@ -15,87 +13,78 @@ DEFINE("PARTIALS",VIEWS."partials/");
 /* set the path to the Model classes folder */
 DEFINE("MODELS",LIB."models");
 
-/* Set path to static pages */
-DEFINE("STATICPAGES", LIB."static");
-
 /* Path to the Mouse application i.e. the Mouse Framework */
 DEFINE("MOUSE",LIB."mouse.php");
 
 /* Define a default layout */
 DEFINE("LAYOUT","standard");
 
-/************************ END CONFIGURE PATHS *************************************/
-
 /* Start the Mouse application */
 require MOUSE;
 require MODELS."/sanitise.php";
 require MODELS."/user.php";
 
-/********************** Controller logic below here ********************************/
-
 get("/", function($app) {
-    $user = new user();                                     // Create new user class.
+    $user = new user();
     $is_auth = false;
     try {
-        $is_auth = $user->is_authenticated();               // Check if current user is authenticated.
-        $app->set_message("is_auth", $is_auth);             // Give this variable to the mainpage.
-        if ($is_auth) {                                     // Check if the user is authenticated,
-            $username = $app->get_session_message("name");  // if so, give the magepage their name.
+        $is_auth = $user->is_authenticated();
+        $app->set_message("is_auth", $is_auth);
+        if ($is_auth) {
+            $username = $app->get_session_message("name");
             $app->set_message("username", $username);
         }
     } catch (Exception $e) {
-        $app->set_flash($e->getMessage());                  // Catch any error and display to user as flash.
-        $app->render(LAYOUT, "mainpage");                   // Render the magepage.
-        exit();                                             // Ensure all code execution stops here.
+        $app->set_flash($e->getMessage());
+        $app->render(LAYOUT, "mainpage");
+        exit();
     }
 
-    $app->render(LAYOUT, "mainpage");                       // Render the mainpage.
+    $app->render(LAYOUT, "mainpage");
 });
 
-get("/signin", function($app) {
-    $app->render("blank", "signin");                        // Always render the sign-in page in a black HTML document.
+get("/signin", function($app){
+    $app->render("blank", "signin");
 });
 
 post("/signin", function($app) {
-    $app->force_to_https("/signin");
-    $email = $app->form("email", "email");                  // Get clean email and password from user.
+    $email = $app->form("email", "email");
     $pwd = $app->form("pwd");
-    $app->set_message("email", ($email) ? $email : "");     // Pass email (if entered) back to sign-in page to display on error.
-    if ($email && $pwd) {                                   // Check if both variables were given.
-        $user = new User();                                 // Create new User class.
+    $app->set_message("email", ($email) ? $email : "");
+    if ($email && $pwd) {
+        $user = new User();
         try {
-            if ($user->sign_in($email, $pwd)) {             // Try to sign in using provided credentials.
-                $app->redirect_to("/");                     // If successful redirect to the mainpage.
+            if ($user->sign_in($email, $pwd)) {
+                $app->redirect_to("/");
             }
         } catch (Exception $e) {
-            $app->set_flash("ERROR: {$e->getMessage()}");   // Catch any error and display to user (should be custom error).
-            $app->render("blank", "signin");                // Redirect back to sign-in page to display error.
+            $app->set_flash("ERROR: {$e->getMessage()}");
+            $app->render("blank", "signin");
         }
     } else {
-        $app->set_flash("Please enter an email and password.");
-        $app->render("blank", "signin");                    // Render the sign-in page with empty error displayed.
+        $app->render("blank", "signin");
     }
 });
 
 get("/signup", function($app) {
-    // $app->force_to_https("/signup");                     // Force user to use https for sensitive messages.
+    // $app->force_to_https("/signup");
 
     // try {
-    //     $user = new User();                              // Create new user class.
-    //     $is_auth = $user->is_authenticated();            // get authentication status.
+    //     $user = new User();
+    //     $is_auth = $user->is_authenticated();
 
-    //     if ($is_auth === true) {                                             // Check if the user is authenticated.
-    //         if ($app->get_session_message("perm") === 3) {                   // Check if the user has the correct permission level to access the page.
-    //             // !==== User is authenticated to level two (admin/superuser/boss) ====!
-    //             // !==== Place render here once an account has been made. ====!
+    //     if ($is_auth) {
+    //         if (!empty($_SESSION["perm"]) && $_SESSION["perm"] == 2) {
+    //             // User is authenticated to level two (admin/superuser/boss)
+    //             // Place render here once an account has been made.
     //         } else {
-    //             $app->set_flash("You do not have access to this feature.");  // Set flash to access denied message.
-    //             $app->redirect_to("/");                                      // Redirect to the mainpage.
-    //             exit();                                                      // Ensure that code execution stops here.
+    //             $app->set_flash("You do not have access to this feature.");
+    //             $app->render(LAYOUT, "mainpage");
+    //             exit();
     //         }
     //     } else {
-    //         $app->set_flash("Please log in to access this feature.");        // If user is not logged in redirect to 403 error.
-    //         $app->redirect_to(LAYOUT, "404");
+    //         $app->set_flash("Please log in to access this feature.");
+    //         $app->render(LAYOUT, "mainpage");
     //         exit();
     //     }
     // } catch (Exception $e) {
@@ -166,16 +155,6 @@ get("/signout", function($app) {
     }
 });
 
-<<<<<<< HEAD
-get("/article/:id", function($app) {
-
-});
-
-
-
-// If no valid URL matches are found, let teh application resolve the issue.
-resolve();
-=======
 
 //Article creation get request
 get("/addarticle", function($app) {
@@ -255,4 +234,3 @@ post("/addarticle", function($app) {
         $app->redirect_to("/");
     }
 });
->>>>>>> articleCreation

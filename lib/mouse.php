@@ -21,222 +21,93 @@ function resolve(){
     Mouse::resolve();
 }
 
-/* autoloader, now we can instantiate model classes in controller without using "require". Models path define in the controller */
+/* autoloader, now we can instantiate model clases in controller without using "require". Models path define in the controller */
 spl_autoload_register(function ($model_class_name){
     require MODELS."/".strtolower($model_class_name).".php";
 });
 
-/**** Custom Exceptions ****/
-class RenderException extends Exception
-{
-    public function __construct($message) {
-	    $message = "MOUSE: ".$message;
-        parent::__construct($message, 0, null);
-    }
-}
 
 class Mouse{
-   private static $instance;
-   private static $route_found = false;
-   private $route = "";
-   private $messages = array();
-   private $method = "";
+    private static $instance;
+    private static $route_found = false;
+    private $route = "";
+    private $messages = array();
+    private $method = "";
 
-   private $route_segments = array();
-   private $route_variables = array();
+    /* 2 NEW members for complex routes */
+    private $route_segments = array();
+    private $route_variables = array();
 
     
-   public static function get_instance(){
-      if(!isset(self::$instance)){
-         self::$instance = new Mouse();
-      }
-      return self::$instance;
-   }
+    public static function get_instance(){
+        if(!isset(self::$instance)){
+            self::$instance = new Mouse();
+        }
+        return self::$instance;
+    }
     
-   protected function __construct(){
-      $this->route = $this->get_route();
-      $this->method = $this->get_method();
-      $this->route_segments = explode("/",trim($this->route,"/"));        
-   }
-
-   public function accepts($accept="text/html") {
-      $accept_header = "";
-
-      if(!empty($_SERVER['HTTP_ACCEPT'])){
-         $accept_header = strtolower($_SERVER['HTTP_ACCEPT']);
-      }
-
-      if(!empty($accept_header)){
-         $accept = str_replace("/","\/",$accept);
-         $accept = str_replace("+","\+",$accept);
-
-         if(preg_match("/{$accept}/i",$accept_header)) {
-            return true;
-         }
-      }
-      return false;
-   }    
-
-   /****** Ajax (XHR) methods ******/
-   public function is_xhr(){
-      if(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'){
-         return true;
-      } 
-      return false; 
-   }
-
-   public function is_json(){
-      if($this->is_xhr() && $this->accepts("application/json")){
-         return true;
-      }
-      return false;
-   }    
-  
-  /****** end Ajax methods ******/
-
-   public function get_route(){
+    protected function __construct(){
+        $this->route = $this->get_route();
+        $this->method = $this->get_method();
+        
+        /* NEW for complex routes */
+        $this->route_segments = explode("/",trim($this->route,"/"));        
+    }
+    
+    public function get_route(){
       return $_SERVER['REQUEST_URI'];  
-   }
-/*
-   public static function register($route,$callback, $method){
-      if(!static::$route_found){
-         $application = static::get_instance();
-         $url_parts = explode("/",trim($route,"/"));
-         $matched = null;
-       
-         if(count($application->route_segments) == count($url_parts)){
-            foreach($url_parts as $key=>$part){
-               if(strpos($part,":") !== false){    
+    }
+ 
+
+    /* Modified register method to handle complex routes */
+    
+    public static function register($route,$callback, $method){
+       if(!static::$route_found){
+          $application = static::get_instance();
+          $url_parts = explode("/",trim($route,"/"));
+          $matched = null;
+          if(count($application->route_segments) == count($url_parts)){
+             foreach($url_parts as $key=>$part){
+                if(strpos($part,":") !== false){
                    //This means we have a route variable
-
-                   //Reject if URI segment is empty? e.g. /admin/user/12. is /admin//12. Invalid URI.
-                   if(empty($application->route_segments[$key])){
-                       $matched = false;
-                       break;
-                   }
-
-                  if(strpos($part,";") !== false){
-                      //means we have a regex
-                      $parts = explode(";",trim($part," "));
-
-                     if(count($parts === 2)){                    
-                        if(!preg_match("/^{$parts[1]}$/",$application->route_segments[$key])){
-                            $matched = false;
-                            break;
-                        }
-                     }
-                     $part = $parts[0];
-                   }
                    $application->route_variables[substr($part,1)] = $application->route_segments[$key];
-                   $matched = true;
-               }
-               else{
-                 //Means we do not have a route variable
-                 if($part == $application->route_segments[$key]){  
-                     if(!$matched){
-                        $matched = true;                         
-                     }
-                 }
-                 else{
-                    //Means routes don't match
-                    $matched = false;
-                    break;
-                 }           
-               }
-            }
-         }
-         else{
-           //The routes have different sizes i.e. they don't match
-            $matched = false;
-         }
-
-         if(!$matched || $application->method != $method){
-           if(!$matched){
-              $matcher = "NULL";
-           }
-           return false;
-         }
-         else{
-           static::$route_found = true;
-           echo $callback($application);
-         }
-      }     
-   }
-*/
-   public static function register($route,$callback, $method){
-      if(!static::$route_found){
-         $application = static::get_instance();
-         $url_parts = explode("/",trim($route,"/"));
-         $matched = null;
-      
-         if(count($application->route_segments) == count($url_parts)) {
-            foreach($url_parts as $key=>$part) {
-               if(strpos($part,":") !== false) {    
-                  //This means we have a route variable
-
-                  //Reject if URI segment is empty? e.g. /admin/user/12. is /admin//12. Invalid URI.
-                  if(empty($application->route_segments[$key])) {
-                     $matched = false;
-                     break;
-                  }
-
-                  if(strpos($part,";") !== false) {
-                     //means we have a regex
-                     $parts = explode(";",trim($part," "));
-
-                     if(count($parts) === 2) {                    
-                        if(!preg_match("/^{$parts[1]}$/",$application->route_segments[$key])) {
-                           $matched = false;
-                           break;
-                        }
-                     }
-                     $part = $parts[0];
-                  }
-                  $application->route_variables[substr($part,1)] = $application->route_segments[$key];
-                  $matched = true;
-               } else {
+                }
+                else{
                   //Means we do not have a route variable
-                  if($part == $application->route_segments[$key]) {
-                     if(!$matched) {
-                        $matched = true;
-                     }
-                  } else {
+                  if($part == $application->route_segments[$key]){
+                      if(!$matched){
+                         $matched = true;
+                      }
+                  }
+                  else{
                      //Means routes don't match
                      $matched = false;
-                     break;
-                  }
-               }
-            }
-         } else {
+                  }           
+                }
+             }
+          }
+          else{
             //The routes have different sizes i.e. they don't match
             $matched = false;
-         }
-
-         if(!$matched || $application->method != $method) {
-            if(!$matched) {
-               $matcher = "NULL";
-            }
+          }
+          if(!$matched || $application->method != $method){
             return false;
-         } else {
+          }
+          else{
             static::$route_found = true;
             echo $callback($application);
-         }
-      }
-   }
-   
-   /**
-    * Returns the value of the route in route_variables
-    *
-    * @param  string $key
-    * @return string
-    */
-   public function route_var($key) {
-      return $this->route_variables[$key];
-   }
-    
-   public function render($layout, $content) {
+          }
+       }     
+    }   
 
-      foreach($this->messages As $key => $val) {
+    /* New function which accepts $key and returns the value of the route in route_variables*/
+    public function route_var($key){
+        return $this->route_variables[$key];
+    }
+    
+   public function render($layout, $content){
+
+      foreach($this->messages As $key => $val){
          $$key = $val;
       }
       
@@ -245,26 +116,27 @@ class Mouse{
 
       $content = VIEWS."templates/{$content}.php";
 
-      if(!empty($layout)) {
+      if(!empty($layout)){
          require VIEWS."templates/{$layout}.layout.php";
-      } else {
+      }
+      else {
          // What is this part for? When would we not need a layout? Think about it.
       }
       exit();
    }
 
-   public function get_request() {
+   public function get_request(){
       return $_SERVER['REQUEST_URI'];
    }
     
    public function is_https(){
-      if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on') {
+      if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']==='on'){
          return true;
       }
       return false;
    }
 
-   public function force_to_https($path="/") {
+   public function force_to_https($path="/"){
       if(!$this->is_https()){
          $host = $_SERVER['HTTP_HOST'];
          $redirect_to_path = "https://".$host.$path;
@@ -273,7 +145,7 @@ class Mouse{
       }
    }
 
-   public function force_to_http($path="/") {
+   public function force_to_http($path="/"){
       if($this->is_https()){
          $host = $_SERVER['HTTP_HOST'];
          $redirect_to_path = "http://".$host.$path;
@@ -282,30 +154,30 @@ class Mouse{
       }
    }
 
-   public function get_method() {
+   public function get_method(){
       $request_method = "GET";
       
-      if(!empty($_SERVER['REQUEST_METHOD'])) {
+      if(!empty($_SERVER['REQUEST_METHOD'])){
          $request_method = strtoupper($_SERVER['REQUEST_METHOD']);
       }
             
       if($request_method === "POST"){
-         if(strtoupper($this->form("_method")) === "POST") {
+         if(strtoupper($this->form("_method")) === "POST"){
             return "POST";
          }
-         if(strtoupper($this->form("_method")) === "PUT") {
+         if(strtoupper($this->form("_method")) === "PUT"){
             return "PUT";
          }
-         if(strtoupper($this->form("_method")) === "DELETE") {
+         if(strtoupper($this->form("_method")) === "DELETE"){
             return "DELETE";
          }   
          return "POST";
       }
-      if($request_method === "PUT") {
+      if($request_method === "PUT"){
          return "PUT";
       }
 
-      if($request_method === "DELETE") {
+      if($request_method === "DELETE"){
          return "DELETE";
       }           
 
@@ -324,7 +196,7 @@ class Mouse{
     *
     * @return string Returns false if key not found.
     */
-   public function form($key, $datatype = "") {
+   public function form($key, $datatype = ""){
       if(!empty($_POST[$key])){
          switch ($datatype) {
             case "email":
@@ -339,13 +211,13 @@ class Mouse{
       return false;
    }
 
-   public function redirect_to($path="/") {
+   public function redirect_to($path="/"){
       header("Location: {$path}");
       exit();
    }
 
-    public function set_session_message($key,$message) {
-       if(!empty($key) && !empty($message)) {
+    public function set_session_message($key,$message){
+       if(!empty($key) && !empty($message)){
           session_start();
           $_SESSION[$key] = $message;
           session_write_close();
@@ -360,9 +232,9 @@ class Mouse{
      */
     public function get_session_message($key) {
       $msg = "";
-      if(!empty($key) && is_string($key)) {
+      if(!empty($key) && is_string($key)){
          session_start();
-         if(!empty($_SESSION[$key])) {
+         if(!empty($_SESSION[$key])){
             $msg = $_SESSION[$key];
          }
          session_write_close();
@@ -370,55 +242,55 @@ class Mouse{
       return $msg;
     }
     
-   /**
-    * Pops value stored in $_SESSION[] given the **$key**.
-    *
-    * @param string $key
-    * @return string $value
-    */
-   public function pop_session_message($key) {
-      $msg = "";
-      if(!empty($key) && is_string($key)) {
-         session_start();
-         if(!empty($_SESSION[$key])) {
-            $msg = $_SESSION[$key];
-            unset($_SESSION[$key]);
-         }
-         session_write_close();
-      }
-      return $msg;
-   }
+    /**
+     * Pops value stored in $_SESSION[] given the **$key**.
+     *
+     * @param string $key
+     * @return string $value
+     */
+    public function pop_session_message($key){
+       $msg = "";
+       if(!empty($key) && is_string($key)){
+          session_start();
+          if(!empty($_SESSION[$key])){
+             $msg = $_SESSION[$key];
+             unset($_SESSION[$key]);
+          }
+          session_write_close();
+       }
+       return $msg;
+    }
     
-   /**
-    * Sets the message 'flash' to the given value.
-    *
-    * @param  mixed $msg
-    * @return void
-    */
-   public function set_flash($msg) {
-         $this->set_session_message("flash",$msg);
-   }
+    /**
+     * Sets the message 'flash' to the given value.
+     *
+     * @param  mixed $msg
+     * @return void
+     */
+    public function set_flash($msg){
+          $this->set_session_message("flash",$msg);
+    }
 
-   public function get_flash() {
-         return $this->pop_session_message("flash");   
-   }
+    public function get_flash(){
+          return $this->pop_session_message("flash");   
+    }
     
 
-   public function set_message($key,$value) {
+    public function set_message($key,$value){
       $this->messages[$key] = $value;
-   }
+    }
 
  
-   public static function resolve() {
+    public static function resolve(){
       if(!static::$route_found){
-         $application = static::get_instance();
-         header("HTTP/1.0 404 Not Found");
-         $application->render("standard","404");
+        $application = static::get_instance();
+        header("HTTP/1.0 404 Not Found");
+        $application->render("standard","404");
       }
-   }
+    }
 
    /* if a complex route matches, it may not be the type (e.g. numeric) we want. We may have to reset route_found to false, so the next callback can have an opportunity to handle the request. */
-   public function reset_route() {
+   public function reset_route(){
        static::$route_found	= false;
    }
 }
