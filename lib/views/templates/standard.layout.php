@@ -25,16 +25,16 @@
         </ul>
         <?php
           if (!empty($name)) {
-            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><img src='/static/user-profile.svg' alt='user icon' style='max-width:50px; max-height:auto;'/><p style='margin:auto;'>{$name}</p></div>";
+            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><!--<img src='/static/user-profile.svg' alt='user icon' style='max-width:50px; max-height:auto;'/>--!><p style='margin:auto;'>{$name}</p></div>";
           }
             // <!-- <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> -->
         ?>
         <div class="text-end">
             <?php
                 if (!empty($is_auth) && $is_auth === true) {
-                    echo "<a href='/signout'><button type='button' class='btn btn-warning'>Sign-out</button></a>";
-                    echo "<a href='/addarticle'><button type='button' class='btn btn-warning'>Create-Article</button></a>";
-                    echo "<a href='/editarticleslist'><button type='button' class='btn btn-warning'>Edit-Articles</button></a>";
+                  echo "<a href='/addarticle'><button type='button' class='btn btn-outline-light me-2'>Create-Article</button></a>";
+                  echo "<a href='/editarticleslist'><button type='button' class='btn btn-outline-light me-2'>Edit-Articles</button></a>";
+                  echo "<a href='/signout'><button type='button' class='btn btn-warning'>Sign-out</button></a>";
                 } else {
                     echo "<a href='/signin'><button type='button' class='btn btn-outline-light me-2'>Sign-in</button></a>";
                 }
