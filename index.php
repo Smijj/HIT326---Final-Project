@@ -178,3 +178,37 @@ get("/addarticle", function($app) {
 
 
 //Article post function
+post("/addarticle", function($app) {
+    try {
+        $author_id = $app->form("author_id");
+        $title = $app->form("title");
+        $content = $app->form("content");
+
+
+        // ===== Need to add some kind of proper filter maybe: filter_input()?
+        $app->set_message("author_id", ($author_id != false) ? $author_id : "");
+        $app->set_message("title", ($title != false) ? $title : "");
+        $app->set_message("content", ($content != false) ? $content : "");
+
+
+        if ($author_id === false || $title === false || $content === false) {
+            $app->set_flash("Please fill all fields.");
+            $app->render(LAYOUT, "addarticle");
+            exit();
+        } else {
+            $article = new Article();
+            try {
+                $article->registerArticle($author_id, $title, $content);
+                $app->set_flash("Success");
+                $app->redirect_to("/");
+            } catch (Exception $e) {
+                $app->set_flash("Error: ".$e->getMessage());
+                $app->render(LAYOUT, "addarticle");
+            }
+            exit();
+        } 
+    } catch (Exception $e) {
+        $app->set_flash($e->getMessage());
+        $app->redirect_to("/");
+    }
+});
