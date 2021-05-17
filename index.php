@@ -168,6 +168,7 @@ get("/signout", function($app) {
     }
 });
 
+<<<<<<< HEAD
 get("/article/:id", function($app) {
 
 });
@@ -175,3 +176,84 @@ get("/article/:id", function($app) {
 
 // If no valid URL matches are found, let teh application resolve the issue.
 resolve();
+=======
+
+//Article creation get request
+get("/addarticle", function($app) {
+    $user = new user();
+    $is_auth = false;
+    $author_id = $user->get_user_id();
+    $app->set_message("author_id", $author_id);
+
+    try {
+        $is_auth = $user->is_authenticated();
+        $app->set_message("is_auth", $is_auth);
+        if ($is_auth) {
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
+            $app->render(LAYOUT, "addarticle");
+        } else {
+            $app->set_flash("You are not authorised");
+            $app->redirect_to("/");
+            exit();
+        }
+    } catch (Exception $e) {
+        $app->set_flash("Database error");
+        $app->redirect_to("/");
+        exit();
+    }
+
+    
+});
+
+
+//Article creation post function
+post("/addarticle", function($app) {
+    
+    $user = new User();
+    $author_id = $user->get_user_id();
+    $app->set_message("author_id", $author_id);
+
+    try {
+         $is_auth = $user->is_authenticated();
+
+        if ($is_auth == true) {
+            $app->set_message("is_auth", $is_auth);
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
+            $title = $app->form("title");
+            $article_content = $app->form("article_content");
+
+
+            // ===== Need to add some kind of proper filter maybe: filter_input()?
+            $app->set_message("title", ($title != false) ? $title : "");
+            $app->set_message("article_content", ($article_content != false) ? $article_content : "");
+
+
+            if ($title === false || $article_content === false) {
+                $app->set_flash("Please fill all fields.");
+                $app->render(LAYOUT, "addarticle");
+                exit();
+            } else {
+                $article = new Article();
+                try {
+                    $article->registerArticle($author_id, $title, $article_content);
+                    $app->set_flash("Success");
+                    $app->redirect_to("/");
+                } catch (Exception $e) {
+                    $app->set_flash("Error: ".$e->getMessage());
+                    $app->render(LAYOUT, "addarticle");
+                }
+                exit();
+            } 
+        } else {
+            $app->set_flash("You are not authorised");
+            $app->redirect_to("/");
+            exit();
+        }
+    } catch (Exception $e) {
+        $app->set_flash($e->getMessage());
+        $app->redirect_to("/");
+    }
+});
+>>>>>>> 6b660bff440ac5d94645eb9fa72505c14f375f93
