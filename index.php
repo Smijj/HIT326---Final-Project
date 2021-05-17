@@ -160,10 +160,15 @@ get("/signout", function($app) {
 get("/addarticle", function($app) {
     $user = new user();
     $is_auth = false;
+    $author_id = $user->get_user_id();
+    $app->set_message("author_id", $author_id);
+
     try {
         $is_auth = $user->is_authenticated();
         $app->set_message("is_auth", $is_auth);
         if ($is_auth) {
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
             $app->render(LAYOUT, "addarticle");
         } else {
             $app->set_flash("You are not authorised");
@@ -171,7 +176,7 @@ get("/addarticle", function($app) {
             exit();
         }
     } catch (Exception $e) {
-        $app->set_flash("Databse error");
+        $app->set_flash("Database error");
         $app->redirect_to("/");
         exit();
     }
@@ -180,33 +185,37 @@ get("/addarticle", function($app) {
 });
 
 
-//Article post function
+//Article creation post function
 post("/addarticle", function($app) {
     
     $user = new User();
-    $is_auth = $user->is_authenticated();
+    $author_id = $user->get_user_id();
+    $app->set_message("author_id", $author_id);
 
-    if ($is_auth == true) {
-        try {
-            $author_id = $app->form("author_id");
+    try {
+         $is_auth = $user->is_authenticated();
+
+        if ($is_auth == true) {
+            $app->set_message("is_auth", $is_auth);
+            $username = $app->get_session_message("name");
+            $app->set_message("username", $username);
             $title = $app->form("title");
-            $content = $app->form("content");
+            $article_content = $app->form("article_content");
 
 
             // ===== Need to add some kind of proper filter maybe: filter_input()?
-            $app->set_message("author_id", ($author_id != false) ? $author_id : "");
             $app->set_message("title", ($title != false) ? $title : "");
-            $app->set_message("content", ($content != false) ? $content : "");
+            $app->set_message("article_content", ($article_content != false) ? $article_content : "");
 
 
-            if ($author_id === false || $title === false || $content === false) {
+            if ($title === false || $article_content === false) {
                 $app->set_flash("Please fill all fields.");
                 $app->render(LAYOUT, "addarticle");
                 exit();
             } else {
                 $article = new Article();
                 try {
-                    $article->registerArticle($author_id, $title, $content);
+                    $article->registerArticle($author_id, $title, $article_content);
                     $app->set_flash("Success");
                     $app->redirect_to("/");
                 } catch (Exception $e) {
@@ -215,13 +224,13 @@ post("/addarticle", function($app) {
                 }
                 exit();
             } 
-        } catch (Exception $e) {
-            $app->set_flash($e->getMessage());
+        } else {
+            $app->set_flash("You are not authorised");
             $app->redirect_to("/");
+            exit();
         }
-    } else {
-        $app->set_flash("You are not authorised");
+    } catch (Exception $e) {
+        $app->set_flash($e->getMessage());
         $app->redirect_to("/");
-        exit();
     }
 });

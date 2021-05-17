@@ -12,6 +12,7 @@
     <form action="/addarticle" method="post">
         <?php require PARTIALS."articleForm.php"; ?>
         <input type="submit" value="submit">
+        
     </form>
  
 </body>

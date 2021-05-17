@@ -118,8 +118,8 @@ class User extends Database {
     public function get_user_id(){
         $id="";
         session_start();
-        if(!empty($_SESSION["id"])){
-            $id = $_SESSION["id"];
+        if(!empty($_SESSION["uid"])){
+            $id = $_SESSION["uid"];
         }
         session_write_close();
         return $id;
