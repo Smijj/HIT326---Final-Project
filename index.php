@@ -157,7 +157,7 @@ get("/signout", function($app) {
 
 
 //Article creation get request
-get("/article", function($app) {
+get("/addarticle", function($app) {
     $user = new user();
     $is_auth = false;
     try {
@@ -173,5 +173,8 @@ get("/article", function($app) {
         exit();
     }
 
-    $app->render(LAYOUT, "article");
+    $app->render(LAYOUT, "addarticle");
 });
+
+
+//Article post function

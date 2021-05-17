@@ -33,7 +33,7 @@
             <?php
                 if (!empty($is_auth) && $is_auth === true) {
                     echo "<a href='/signout'><button type='button' class='btn btn-warning'>Sign-out</button></a>";
-                    echo "<a href='/article'><button type='button' class='btn btn-warning'>Create-Article</button></a>";
+                    echo "<a href='/addarticle'><button type='button' class='btn btn-warning'>Create-Article</button></a>";
                 } else {
                     echo "<a href='/signin'><button type='button' class='btn btn-outline-light me-2'>Sign-in</button></a>";
                 }
