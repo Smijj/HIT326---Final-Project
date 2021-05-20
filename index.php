@@ -280,3 +280,5 @@ get("/editarticleslist", function($app) {
         exit();
     }
 });
+
+resolve();
