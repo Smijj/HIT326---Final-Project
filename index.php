@@ -46,7 +46,7 @@ get("/", function($app) {
     } catch (Exception $e) {
         $app->set_flash("Internal Error. Please try again later.");
     } finally {
-        $app->render(LAYOUT, "mainpage");                       // Render the mainpage.
+        $app->render(LAYOUT, "mainpage");                   // Render the mainpage.
     }
 
 });
@@ -80,11 +80,11 @@ get("/signup", function($app) {
     // $app->force_to_https("/signup");                     // Force user to use https for sensitive messages.
 
     try {
-        $user = new User();                              // Create new user class.
-        $is_auth = $user->is_authenticated();            // get authentication status.
+        $user = new User();                                 // Create new user class.
+        $is_auth = $user->is_authenticated();               // get authentication status.
 
-        if ($is_auth === true) {                                            // Check if the user is authenticated.
-            if ($app->get_session_message("perm") === 3) {                  // Check if the user has the correct permission level to access the page.
+        if ($is_auth === true) {                            // Check if the user is authenticated.
+            if ($app->get_session_message("perm") === 3) {  // Check if the user has the correct permission level to access the page.
                 // User is authenticated to level 3 (admin/superuser/boss)
                 $app->render(LAYOUT, "signup");
                 exit();
@@ -92,14 +92,14 @@ get("/signup", function($app) {
                 $app->render(LAYOUT, "403");                                // Render the 403: access denied error message.
                 exit();                                                     // Ensure that code execution stops here.
             }
-        } elseif ($db_empty = $user->is_db_empty()) {                       // Check if DB is empty.
+        } elseif ($user->is_db_empty() === true) {                          // Check if DB is empty.
             $app->set_message("db_empty", true);
             $app->set_flash("No users in DB please create an admin now.");  // Display page anyway if there's no users to signin.
             $app->render(LAYOUT, "signup");
         } else {
             $app->set_flash("Please log in to access this feature.");       // If user is not logged in redirect to 403 error.
             navbar_init($app, $user, $is_auth);
-            $app->redirect_to(LAYOUT, "404");
+            $app->render(LAYOUT, "404");
             exit();
         }
     } catch (Exception $e) {
@@ -218,31 +218,40 @@ post("/addarticle", function($app) {
             // $app->set_message("is_auth", $is_auth);
             // $username = $app->get_session_message("name");
             // $app->set_message("username", $username);
-            navbar_init($app, $user, $is_auth);
+
+            /* Commented out for AJAX testing */
+            // navbar_init($app, $user, $is_auth);
             $title = $app->form("title");
             $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
 
-
-            // ===== Need to add some kind of proper filter maybe: filter_input()?
-            $app->set_message("title", ($title != false) ? $title : "");
-            $app->set_message("keywords", ($keywords != false) ? $keywords : "");
-            $app->set_message("article_content", ($article_content != false) ? $article_content : "");
+            /* Commented out for AJAX testing */
+            // $app->set_message("title", ($title != false) ? $title : "");
+            // $app->set_message("keywords", ($keywords != false) ? $keywords : "");
+            // $app->set_message("article_content", ($article_content != false) ? $article_content : "");
 
 
             if ($title === false || $keywords === false || $article_content === false) {
-                $app->set_flash("Please fill all fields.");
-                $app->render(LAYOUT, "addarticle");
+                // $app->set_flash("Please fill all fields.");
+                // $app->render(LAYOUT, "addarticle");
+                $app->set_message("result", 0);
+                $app->set_message("html", "Please fill all fields.");
+                $app->render(NULL, "addarticle.json");
                 exit();
             } else {
                 $article = new Article();
                 try {
                     $article->registerArticle($author_id, $title, $keywords, $article_content);
-                    $app->set_flash("Success");
-                    $app->redirect_to("/");
+                    // $app->set_flash("Success");
+                    // $app->redirect_to("/");
+                    $app->set_message("result", 0);
+                    $app->render(NULL, "addarticle.json");
                 } catch (Exception $e) {
-                    $app->set_flash("Error: ".$e->getMessage());
-                    $app->render(LAYOUT, "addarticle");
+                    // $app->set_flash("Error: ".$e->getMessage());
+                    // $app->render(LAYOUT, "addarticle");
+                    $app->set_message("result", 0);
+                    $app->set_message("html", "Internal Error: ".$e->getMessage());
+                    $app->render(NULL, "addarticle.json");
                 }
                 exit();
             } 

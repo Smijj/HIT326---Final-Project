@@ -8,6 +8,8 @@ function navbar_init($app, $user = null, $is_auth = null) {
     
     if ($is_auth == null) { $is_auth = $user->is_authenticated(); }
 
+    if ($is_auth === true) { $app->set_message("perm", $app->get_session_message("perm")); }
+
     $app->set_message("is_auth", $is_auth);
     $app->set_message("name", $app->get_session_message("name"));
 }
