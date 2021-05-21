@@ -28,6 +28,7 @@ require MOUSE;
 require MODELS."sanitise.php";
 require MODELS."user.php";
 require MODELS."navbar.php";
+require MODELS."article.php";
 
 /********************** Controller logic below here ********************************/
 
@@ -280,3 +281,8 @@ get("/editarticleslist", function($app) {
         exit();
     }
 });
+
+get("/article/:id[/d+]", )
+
+// Resolve all other URL cases. (will most likely show 404).
+resolve();
