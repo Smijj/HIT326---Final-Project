@@ -1,6 +1,7 @@
     <div class='flash'><?php if (!empty($flash)) { echo "{$flash}"; } ?></div>
     <div class="ArticleForm">
         <form action="/addarticle" method="post" id="addArticleForm">
+            <input type="hidden" name="_method" value="PUT">
             <?php require PARTIALS."articleForm.php"; ?>
             <input type="submit" value="submit">
         </form>

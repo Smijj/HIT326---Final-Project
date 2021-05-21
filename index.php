@@ -206,7 +206,7 @@ get("/addarticle", function($app) {
 
 
 //Article creation post function
-post("/addarticle", function($app) {
+put("/addarticle", function($app) {
     
     $user = new User();
     $author_id = $user->get_user_id();
