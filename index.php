@@ -282,7 +282,9 @@ get("/editarticleslist", function($app) {
     }
 });
 
-get("/article/:id[/d+]", )
+get("/article/:id[/d+]", function($app) {
+
+});
 
 // Resolve all other URL cases. (will most likely show 404).
 resolve();
