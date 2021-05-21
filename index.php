@@ -244,7 +244,7 @@ post("/addarticle", function($app) {
                     $article->registerArticle($author_id, $title, $keywords, $article_content);
                     // $app->set_flash("Success");
                     // $app->redirect_to("/");
-                    $app->set_message("result", 0);
+                    $app->set_message("result", 1);
                     $app->render(NULL, "addarticle.json");
                 } catch (Exception $e) {
                     // $app->set_flash("Error: ".$e->getMessage());

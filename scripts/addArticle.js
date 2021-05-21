@@ -7,21 +7,22 @@ $( function() {
             function (data, textStatus, jqXHR) {
                 if (data != undefined && data.result != undefined && data.html != undefined) {
                     if (data.result == 1) {
-                        $("div .ArticleForm").css({"background-color":"#429C3E"});
-                        $("div .ArticleForm").text(data.html);
+                        $(".ArticleForm").css({"background-color":"#429C3E"});
+                        $(".ArticleForm").html(data.html);
+                        $(".flash").html("");
                     } else {
-                        $("div .flash").css({"background-color":"#AF3641"});
-                        $("div .flash").text(data.html);
+                        $(".flash").css({"background-color":"#AF3641"});
+                        $(".flash").html(data.html);
                     }
                 } else {
-                    $("div .ArticleForm").css({"background-color":"#AF3641"});
-                    $("div .flash").html("An error has occured. Please try again.");
+                    $(".flash").css({"background-color":"#AF3641"});
+                    $(".flash").html("An error has occurred. Please try again.");
                 }
             },
             "json"
         ).fail( function() {
-            $("div .flash").css({"background-color":"#AF3641"});
-            $("div .flash").text("An error has occured attempting to contact the server. Please try again later.");
+            $(".flash").css({"background-color":"#AF3641"});
+            $(".flash").text("An error has occurred attempting to contact the server. Please try again later.");
         });
     });
 });
