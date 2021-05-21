@@ -1,6 +1,6 @@
 <?php
 
-/**** Custom Exceptions ****/
+/**** === Custom Exceptions === ****/
 /**
  * Exception handeling Database related errors.
  */
@@ -266,11 +266,11 @@ class User extends Database {
             $sql = "SELECT user_id FROM users";
             if ($stmt = $this->prepare($sql)) {
                 if ($stmt->execute()) {
-                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
-                    if (empty($result)) {
-                        return false;
-                    } else {
+                    $result = $stmt->rowCount();
+                    if ($result === 0) {
                         return true;
+                    } else {
+                        return false;
                     }
                 } else {
                     throw new DBException("Could not prepare statement.");

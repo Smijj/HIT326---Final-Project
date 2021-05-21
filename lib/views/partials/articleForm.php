@@ -4,4 +4,4 @@
 <label for="keywords">Keywords:</label>
 <input type="keywords" name="keywords" id="keywords" value="<?php if (isset($keywords)) {echo $keywords;} ?>" autocomplete="keywords"><br>
 <label for="article_content">Content:</label>
-<input type="article_content" name="article_content" id="article_content" value="<?php if (isset($article_content)) {echo $article_content;} ?>" autocomplete="article_content"><br>
+<textarea type="article_content" name="article_content" id="article_content" value="<?php if (isset($article_content)) {echo $article_content;} ?>" autocomplete="article_content"></textarea><br>

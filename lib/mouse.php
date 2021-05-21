@@ -86,11 +86,11 @@ class Mouse{
    }
 
    public function is_json(){
-      if($this->is_xhr() && $this->accepts("application/json")){
+      if($this->is_xhr() && $this->accepts("application/json")) {
          return true;
       }
       return false;
-   }    
+   }
   
   /****** end Ajax methods ******/
 
@@ -244,11 +244,14 @@ class Mouse{
       $flash = $this->get_flash();
 
       $content = VIEWS."templates/{$content}.php";
-
+      
       if(!empty($layout)) {
          require VIEWS."templates/{$layout}.layout.php";
       } else {
-         // What is this part for? When would we not need a layout? Think about it.
+         // AJAX response.
+         header('Content-Type: application/json');
+         require $content;
+         echo json_encode($data);
       }
       exit();
    }
@@ -410,10 +413,11 @@ class Mouse{
 
  
    public static function resolve() {
-      if(!static::$route_found){
-         $application = static::get_instance();
+      if(!static::$route_found) {
+         $app = static::get_instance();
          header("HTTP/1.0 404 Not Found");
-         $application->render("standard","404");
+         $app->set_message("title", "404 Page not Found");
+         $app->render("standard","404");
       }
    }
 
