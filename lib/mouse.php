@@ -163,7 +163,9 @@ class Mouse{
       }     
    }
 */
-   public static function register($route,$callback, $method){
+
+//      /article/:id[\d+]
+   public static function register($route, $callback, $method) {
       if(!static::$route_found){
          $application = static::get_instance();
          $url_parts = explode("/",trim($route,"/"));
@@ -186,6 +188,7 @@ class Mouse{
 
                      if(count($parts) === 2) {                    
                         if(!preg_match("/^{$parts[1]}$/",$application->route_segments[$key])) {
+                           // Regex failed, invalid route.
                            $matched = false;
                            break;
                         }

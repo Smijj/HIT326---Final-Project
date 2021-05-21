@@ -4,7 +4,7 @@ class articleData {
     public string $title;
     public string $content;
     public string $keywords;
-    public datetime $date_last_edit;
+    public string $date_last_edit;
     public bool $public;
     public string $name;
     
@@ -14,7 +14,7 @@ class articleData {
      * @param  string $title
      * @param  string $content
      * @param  string $keywords
-     * @param  datetime $date_last_edit
+     * @param  string $date_last_edit
      * @param  bool $public
      * @param  string $name
      * @return void
@@ -55,20 +55,21 @@ class Article extends Database {
      * Can return DBException on DB error.
      *
      * @param  string $id
-     * @return articleData
+     * @return articleData Returns boolean **False** on fail/not found.
      */
     public function get_article($id): articleData {
         if (!empty($id)) {
             $sql = "SELECT title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id AND article_id=?";
-
             $stmt = $this->prepare($sql);
-            if($stmt->execute($id)) {
+            if($stmt->execute(array($id))) {
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (!empty($result)) {
-                    return new articleData($result['title'], $result['content'], $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['users.fname']." ".$result['users.lname']);
+                    return new articleData($result['title'], $result['content'], $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
+                } else {
+                    return false;
                 }
             }
         }
-        return new articleData();
+        return false;
     }
 }

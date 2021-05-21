@@ -205,7 +205,7 @@ get("/addarticle", function($app) {
 });
 
 
-//Article creation post function
+//Article creation post function: AJAX
 put("/addarticle", function($app) {
     
     $user = new User();
@@ -291,8 +291,21 @@ get("/editarticleslist", function($app) {
     }
 });
 
-get("/article/:id[/d+]", function($app) {
-
+get("/article/:id;[\d]+", function($app) {
+    $article = new Article();
+    try {
+        $data = $article->get_article($app->route_var('id'));
+    } catch (DBException $e) {
+        $app->set_flash("Internal DB error: ".$e->getMessage());
+        $app->redirect_to("/");
+    }
+    if ($data !== false) {
+        $app->set_message("articles_data", $data);
+        $app->render(LAYOUT, "article");
+    } else {
+        $app->render(LAYOUT, "404");
+        exit();
+    }
 });
 
 // Resolve all other URL cases. (will most likely show 404).
