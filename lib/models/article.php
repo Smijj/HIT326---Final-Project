@@ -29,6 +29,7 @@ class articleData {
     }
 }
 
+
 class Article extends Database {
 
 	public function registerArticle($author_id, $title, $keywords, $article_content) {
@@ -49,6 +50,7 @@ class Article extends Database {
 
     }
     
+
     /**
      * Return **articleData** class with data of article or empty if nothing found.
      * 
@@ -77,4 +79,34 @@ class Article extends Database {
         }
         return false;
     }
+
+
+
+    /**
+     * Return **article_list** class with data of all articles in the article table or empty if nothing found.
+     * 
+     * Can return DBException on DB error.
+     *
+     * @return output Returns boolean **False** on fail/not found.
+     */
+
+    public function article_list() {
+        $output[] = null;
+        $sql = "SELECT title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id ORDER BY update_date ASC";
+        $stmt = $this->prepare($sql);
+        if($stmt->execute()) {
+            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            if (!empty($result)) {
+                foreach ($result as $key => $value) {
+                    $output[$key] = new articleData($value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
+                }
+                return $output;
+            } else {
+                return false;
+            }
+        }
+        return false;
+    }
+
+
 }
