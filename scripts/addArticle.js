@@ -1,28 +1,31 @@
 $( function() {
     $("#addArticleForm").submit( function(event) {
-        event.preventDefault();
-        $("#article_content").val($("#article_content").val().replace("\r\n", "<br/>\r\n"));
-        var data = $(this).serialize();
+        event.preventDefault();                                                 // Stop the automatic submission of thee form.
+        var data = $(this).serialize();                                         // Get all of the form data serialised.
+        // Post the data to the sever.
         $.post("/addarticle", data,
             function (data, textStatus, jqXHR) {
                 if (data != undefined && data.result != undefined && data.html != undefined) {
                     if (data.result == 1) {
-                        $(".ArticleForm").css({"background-color":"#429C3E"});
-                        $(".ArticleForm").html(data.html);
-                        $(".flash").html("");
+                        // Successfully added to the database.
+                        $(".ArticleForm").css({"background-color":"#429C3E"});  // Set background colour to green-ish.
+                        $(".ArticleForm").html(data.html);                      // Clear form and replace with html from server.
+                        $(".flash").html("");                                   // Clear flash.
                     } else {
-                        $(".flash").css({"background-color":"#AF3641"});
-                        $(".flash").html(data.html);
+                        // Error, display message from server.
+                        $(".flash").css({"background-color":"#AF3641"});        // Set the flash's background colour to red-ish
+                        $(".flash").html(data.html);                            // Display error message from server.
                     }
                 } else {
-                    $(".flash").css({"background-color":"#AF3641"});
-                    $(".flash").html("An error has occurred. Please try again.");
+                    // Error, display generic message.
+                    $(".flash").css({"background-color":"#AF3641"});            // Set the flash's background colour to red-ish
+                    $(".flash").html("An error has occurred. Please try again."); // Display generic error message.
                 }
             },
             "json"
         ).fail( function() {
-            $(".flash").css({"background-color":"#AF3641"});
-            $(".flash").text("An error has occurred attempting to contact the server. Please try again later.");
+            $(".flash").css({"background-color":"#AF3641"});                    // Set the flash's background colour to red-ish
+            $(".flash").text("An error has occurred attempting to contact the server. Please try again later."); // Display generic error message.
         });
     });
 });
