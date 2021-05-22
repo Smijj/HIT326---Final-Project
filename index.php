@@ -294,6 +294,7 @@ get("/editarticleslist", function($app) {
 
 get("/article/:id;[\d]+", function($app) {
     $article = new Article();
+    navbar_init($app);
     try {
         $data = $article->get_article($app->route_var('id'));
     } catch (DBException $e) {
