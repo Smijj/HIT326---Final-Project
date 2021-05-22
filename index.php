@@ -294,10 +294,14 @@ get("/editarticleslist", function($app) {
 
 
 get("/articlelist", function($app) {
+    $article = new Article();
+    navbar_init($app);
+
     try {
-        navbar_init($app);
+        $data = $article->article_list();
+        $app->set_message("article_list", $data);
         $app->render(LAYOUT, "articlelist");
-    } catch (Exception $e) {
+    } catch (DBException $e) {
         $app->set_flash("Database error");
         $app->redirect_to("/");
         exit();
