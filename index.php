@@ -35,6 +35,9 @@ require MODELS."article.php";
 get("/", function($app) {
     $user = new user();                                     // Create new user class.
     $is_auth = false;
+    if ($user->is_db_empty()) {
+        $app->redirect_to("/signup");
+    }
     try {
         $is_auth = $user->is_authenticated();               // Check if current user is authenticated.
         // $app->set_message("is_auth", $is_auth);             // Give this variable to the mainpage.
@@ -53,12 +56,12 @@ get("/", function($app) {
 });
 
 get("/signin", function($app) {
+    $app->force_to_https("/signin");
     $app->set_csrftoken();
     $app->render("blank", "signin");                        // Always render the sign-in page in a black HTML document.
 });
 
 post("/signin", function($app) {
-    // $app->force_to_https("/signin");
     $email = $app->form("email", "email");                  // Get clean email and password from user.
     $pwd = $app->form("pwd");
     $app->set_message("email", ($email) ? $email : "");     // Pass email (if entered) back to sign-in page to display on error.
@@ -80,7 +83,7 @@ post("/signin", function($app) {
 });
 
 get("/signup", function($app) {
-    // $app->force_to_https("/signup");                     // Force user to use https for sensitive messages.
+    $app->force_to_https("/signup");                     // Force user to use https for sensitive messages.
 
     try {
         $user = new User();                                 // Create new user class.
@@ -100,6 +103,7 @@ get("/signup", function($app) {
         } elseif ($user->is_db_empty() === true) {                          // Check if DB is empty.
             $app->set_message("db_empty", true);
             $app->set_flash("No users in DB please create an admin now.");  // Display page anyway if there's no users to signin.
+            $app->set_csrftoken();
             $app->render(LAYOUT, "signup");
         } else {
             $app->set_flash("Please log in to access this feature.");       // If user is not logged in redirect to 403 error.
@@ -130,7 +134,7 @@ put("/signup", function($app) {
     // Check if Csrf token is valid.
     if (!$app->check_csrftoken($app->form("token"))) {
         $app->set_flash("Invalid Authentication token. Please try again.");
-        $app->render("blank", "signin");
+        $app->render("blank", "signup");
     }
 
     try {
@@ -176,6 +180,7 @@ put("/signup", function($app) {
 });
 
 get("/signout", function($app) {
+    $app->force_to_https("/signin");
     $user = new user();
     if ($user->is_authenticated()) {
         if ($user->signout()) {
@@ -191,6 +196,7 @@ get("/signout", function($app) {
 
 //Article creation get request
 get("/addarticle", function($app) {
+    $app->force_to_https("/signin");
     $user = new user();
     $is_auth = false;
     $author_id = $user->get_user_id();
@@ -290,6 +296,7 @@ put("/addarticle", function($app) {
 
 //Display Edit Articles List
 get("/editarticleslist", function($app) {
+    $app->force_to_https("/signin");
     $user = new user();
     $is_auth = false;
 
@@ -315,6 +322,7 @@ get("/editarticleslist", function($app) {
 
 
 get("/articlelist", function($app) {
+    $app->force_to_https("/signin");
     $article = new Article();
     navbar_init($app);
 
@@ -331,6 +339,7 @@ get("/articlelist", function($app) {
 
 
 get("/article/:id;[\d]+", function($app) {
+    $app->force_to_https("/signin");
     $article = new Article();
     navbar_init($app);
     try {
