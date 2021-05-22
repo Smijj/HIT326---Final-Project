@@ -340,14 +340,14 @@ get("/articlelist", function($app) {
     }
 
     if ($is_auth == true && $user_data->perm >= 2) {
-        $show_Editor_Elements = true;
+        $high_level_user = true;
     } else {
-        $show_Editor_Elements = false;
+        $high_level_user = false;
     }
 
     if ($article_data !== false) {
         $app->set_message("article_list", $article_data);
-        $app->set_message("show_Editor_Elements", $show_Editor_Elements);
+        $app->set_message("high_level_user", $high_level_user);
         $app->render(LAYOUT, "articlelist");
     } else {
         $app->set_flash("Database error");
