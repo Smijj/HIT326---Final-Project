@@ -329,8 +329,8 @@ get("/articlelist", function($app) {
     navbar_init($app);
 
     try {
-        $data = $article->article_list();
-        $app->set_message("article_list", $data);
+        $article_data = $article->article_list();
+        $app->set_message("article_list", $article_data);
         $app->render(LAYOUT, "articlelist");
     } catch (DBException $e) {
         $app->set_flash("Database error");
@@ -342,24 +342,46 @@ get("/articlelist", function($app) {
 
 get("/article/:id;[\d]+", function($app) {
     $app->force_to_https("/signin");
+    $user = new User;
     $article = new Article();
     navbar_init($app);
     try {
-        $data = $article->get_article($app->route_var('id'), true);
+        $article_data = $article->get_article($app->route_var('id'), true);
 
     } catch (DBException $e) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
     }
-    if ($data !== false && $data->public === true) {
 
-        $app->set_message("articles_data", $data);
-        $app->render(LAYOUT, "article");
+    if ($article_data !== false) {
+        // If the article is public then show it
+        if ($article_data->public === true) {
+            $app->set_message("articles_data", $article_data);
+            $app->render(LAYOUT, "article");
+        } else {
+            $user_data = $user->get_user();
+            $user_id = $user->get_user_id();
+            $is_auth = $user->is_authenticated();
+
+            // Show the article even if it isn't public IF:
+            // The user is authenticated & their permissions are >= 2
+            // OR:
+            // The user is authenticated & their permissions == 1 & their user_id matches the author_id of the article (meaning they were the author)
+            if ($is_auth == true && $user_data->perm >= 2 || $is_auth == true && $user_data->perm == 1 && $user_id == $article_data->author_id) {
+                $app->set_message("articles_data", $article_data);
+                $app->render(LAYOUT, "article");
+            } else {
+                $app->set_flash("You are not authorised");
+                $app->redirect_to("/");
+                exit();
+            }
+        }
     } else {
         $app->render(LAYOUT, "404");
         exit();
     }
 });
+
 
 get("/editAccount", function($app) {
     $user = new User();

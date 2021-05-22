@@ -27,12 +27,13 @@ body.center-body {
 
 
 
-/* Standard Layout Styles */
+/* STANDARD LAYOUT STYLES */
 #content {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
+
 
 /* ARTICLE LIST PAGE STYLES */
 
@@ -54,9 +55,12 @@ body.center-body {
 }
 .article_list_subheader {
     margin: 0;
+    font-size: 0.8rem;
+
 }
 .article_list_keywords {
-    margin: 0;
+    margin: 5px 0 10px 0;
+    font-weight: bold;
 }
 
 .article_list:hover {
