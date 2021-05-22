@@ -1,6 +1,7 @@
 <?php
 
 class articleData {
+    public int $article_id;
     public string $title;
     public string $content;
     public string $keywords;
@@ -11,6 +12,7 @@ class articleData {
     /**
      * __construct
      *
+     * @param  int $article_id;
      * @param  string $title
      * @param  string $content
      * @param  string $keywords
@@ -19,7 +21,8 @@ class articleData {
      * @param  string $name
      * @return void
      */
-    public function __construct($title = null, $content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
+    public function __construct($article_id = null, $title = null, $content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
+        $this->article_id = $article_id;
         $this->title = $title;
         $this->content = $content;
         $this->keywords = $keywords;
@@ -62,7 +65,7 @@ class Article extends Database {
      */
     public function get_article($id, $to_html = false): articleData {
         if (!empty($id)) {
-            $sql = "SELECT title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id AND article_id=?";
+            $sql = "SELECT article_id, title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id AND article_id=?";
             $stmt = $this->prepare($sql);
             if($stmt->execute(array($id))) {
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -71,7 +74,7 @@ class Article extends Database {
                     if ($to_html == true) {
                         $article_content = nl2br($article_content);     // Replaces new line codes with html ones.
                     }
-                    return new articleData($result['title'], $article_content, $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
+                    return new articleData($result['article_id'], $result['title'], $article_content, $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
                 } else {
                     return false;
                 }
@@ -92,13 +95,13 @@ class Article extends Database {
 
     public function article_list() {
         $output[] = null;
-        $sql = "SELECT title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id ORDER BY update_date ASC";
+        $sql = "SELECT article_id, title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id ORDER BY creation_date DESC";
         $stmt = $this->prepare($sql);
         if($stmt->execute()) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (!empty($result)) {
                 foreach ($result as $key => $value) {
-                    $output[$key] = new articleData($value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
+                    $output[$key] = new articleData($value['article_id'], $value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
                 }
                 return $output;
             } else {
