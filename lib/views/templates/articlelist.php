@@ -14,7 +14,17 @@
             <p class='article_list_subheader'>Written by {$article_data->name}</p>
             <p class='article_list_subheader'>Last Edited on {$article_data->date_last_edit}</p>
             <p class='article_list_keywords'>Keywords: {$article_data->keywords}</p>
-        </article>";
+        ";
+        if ($show_Editor_Elements == true) {
+            echo "<div class='article_list_buttons'>
+                    <div data-href='#'>Edit</div>
+                    <div data-href='#'>Delete</div>
+                </div>
+            </article>";
+        } else {
+            echo "</article>";
+        }
+        
     }
 
 ?>

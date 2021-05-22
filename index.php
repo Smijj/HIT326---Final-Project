@@ -325,14 +325,31 @@ get("/editarticleslist", function($app) {
 
 get("/articlelist", function($app) {
     $app->force_to_https("/signin");
+    
     $article = new Article();
+    $user = new User();
+    $is_auth = $user->is_authenticated();
+    
     navbar_init($app);
-
     try {
         $article_data = $article->article_list();
-        $app->set_message("article_list", $article_data);
-        $app->render(LAYOUT, "articlelist");
+        $user_data = $user->get_user();
     } catch (DBException $e) {
+        $app->set_flash("Internal DB error: ".$e->getMessage());
+        $app->redirect_to("/");
+    }
+
+    if ($is_auth == true && $user_data->perm >= 2) {
+        $show_Editor_Elements = true;
+    } else {
+        $show_Editor_Elements = false;
+    }
+
+    if ($article_data !== false) {
+        $app->set_message("article_list", $article_data);
+        $app->set_message("show_Editor_Elements", $show_Editor_Elements);
+        $app->render(LAYOUT, "articlelist");
+    } else {
         $app->set_flash("Database error");
         $app->redirect_to("/");
         exit();
@@ -342,12 +359,16 @@ get("/articlelist", function($app) {
 
 get("/article/:id;[\d]+", function($app) {
     $app->force_to_https("/signin");
-    $user = new User;
+    
     $article = new Article();
+    $user = new User();
+    $is_auth = $user->is_authenticated();
+    
     navbar_init($app);
     try {
         $article_data = $article->get_article($app->route_var('id'), true);
-
+        $user_data = $user->get_user();
+        $user_id = $user->get_user_id();
     } catch (DBException $e) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
@@ -359,10 +380,6 @@ get("/article/:id;[\d]+", function($app) {
             $app->set_message("articles_data", $article_data);
             $app->render(LAYOUT, "article");
         } else {
-            $user_data = $user->get_user();
-            $user_id = $user->get_user_id();
-            $is_auth = $user->is_authenticated();
-
             // Show the article even if it isn't public IF:
             // The user is authenticated & their permissions are >= 2
             // OR:
