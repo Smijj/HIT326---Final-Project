@@ -27,13 +27,13 @@ spl_autoload_register(function ($model_class_name){
 });
 
 /**** Custom Exceptions ****/
-class RenderException extends Exception
-{
-    public function __construct($message) {
-	    $message = "MOUSE: ".$message;
-        parent::__construct($message, 0, null);
-    }
-}
+// class RenderException extends Exception
+// {
+//     public function __construct($message) {
+// 	    $message = "MOUSE: ".$message;
+//         parent::__construct($message, 0, null);
+//     }
+// }
 
 class Mouse{
    private static $instance;
@@ -351,6 +351,7 @@ class Mouse{
    public static function resolve() {
       if(!static::$route_found) {
          $app = static::get_instance();
+         navbar_init($app);                              // Set variables for navbar if logged in.
          header("HTTP/1.0 404 Not Found");
          $app->set_message("title", "404 Page not Found");
          $app->render("standard","404");
