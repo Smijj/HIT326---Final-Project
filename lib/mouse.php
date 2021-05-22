@@ -97,74 +97,7 @@ class Mouse{
    public function get_route(){
       return $_SERVER['REQUEST_URI'];  
    }
-/*
-   public static function register($route,$callback, $method){
-      if(!static::$route_found){
-         $application = static::get_instance();
-         $url_parts = explode("/",trim($route,"/"));
-         $matched = null;
-       
-         if(count($application->route_segments) == count($url_parts)){
-            foreach($url_parts as $key=>$part){
-               if(strpos($part,":") !== false){    
-                   //This means we have a route variable
 
-                   //Reject if URI segment is empty? e.g. /admin/user/12. is /admin//12. Invalid URI.
-                   if(empty($application->route_segments[$key])){
-                       $matched = false;
-                       break;
-                   }
-
-                  if(strpos($part,";") !== false){
-                      //means we have a regex
-                      $parts = explode(";",trim($part," "));
-
-                     if(count($parts === 2)){                    
-                        if(!preg_match("/^{$parts[1]}$/",$application->route_segments[$key])){
-                            $matched = false;
-                            break;
-                        }
-                     }
-                     $part = $parts[0];
-                   }
-                   $application->route_variables[substr($part,1)] = $application->route_segments[$key];
-                   $matched = true;
-               }
-               else{
-                 //Means we do not have a route variable
-                 if($part == $application->route_segments[$key]){  
-                     if(!$matched){
-                        $matched = true;                         
-                     }
-                 }
-                 else{
-                    //Means routes don't match
-                    $matched = false;
-                    break;
-                 }           
-               }
-            }
-         }
-         else{
-           //The routes have different sizes i.e. they don't match
-            $matched = false;
-         }
-
-         if(!$matched || $application->method != $method){
-           if(!$matched){
-              $matcher = "NULL";
-           }
-           return false;
-         }
-         else{
-           static::$route_found = true;
-           echo $callback($application);
-         }
-      }     
-   }
-*/
-
-//      /article/:id[\d+]
    public static function register($route, $callback, $method) {
       if(!static::$route_found){
          $application = static::get_instance();
