@@ -292,6 +292,19 @@ get("/editarticleslist", function($app) {
     }
 });
 
+
+get("/articlelist", function($app) {
+    try {
+        navbar_init($app);
+        $app->render(LAYOUT, "articlelist");
+    } catch (Exception $e) {
+        $app->set_flash("Database error");
+        $app->redirect_to("/");
+        exit();
+    }
+});
+
+
 get("/article/:id;[\d]+", function($app) {
     $article = new Article();
     try {
