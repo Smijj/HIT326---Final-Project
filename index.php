@@ -213,7 +213,7 @@ put("/addarticle", function($app) {
     $app->set_message("author_id", $author_id);
 
     try {
-         $is_auth = $user->is_authenticated();
+        $is_auth = $user->is_authenticated();
 
         if ($is_auth == true) {
             // $app->set_message("is_auth", $is_auth);
