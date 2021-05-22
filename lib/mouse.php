@@ -362,6 +362,21 @@ class Mouse{
    public function reset_route() {
        static::$route_found	= false;
    }
+
+   public function set_csrftoken() {
+      $token = hash("md5", uniqid(mt_rand(), true));
+      $this->set_session_message("csrf_token", $token);
+      $this->set_message("csrf_token", $token);
+      return $token;
+   }
+
+   public function check_csrftoken($form_token): bool {
+      $server_token = $this->get_session_message("csrf_token");
+      if ($server_token === $form_token) {
+         return true;
+      }
+      return false;
+   }
 }
 
 

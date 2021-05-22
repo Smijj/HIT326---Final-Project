@@ -53,6 +53,7 @@ get("/", function($app) {
 });
 
 get("/signin", function($app) {
+    $app->set_csrftoken();
     $app->render("blank", "signin");                        // Always render the sign-in page in a black HTML document.
 });
 
@@ -61,6 +62,7 @@ post("/signin", function($app) {
     $email = $app->form("email", "email");                  // Get clean email and password from user.
     $pwd = $app->form("pwd");
     $app->set_message("email", ($email) ? $email : "");     // Pass email (if entered) back to sign-in page to display on error.
+
     if ($email && $pwd) {                                   // Check if both variables were given.
         $user = new User();                                 // Create new User class.
         try {
@@ -85,8 +87,10 @@ get("/signup", function($app) {
         $is_auth = $user->is_authenticated();               // get authentication status.
 
         if ($is_auth === true) {                            // Check if the user is authenticated.
-            if ($app->get_session_message("perm") === 3) {  // Check if the user has the correct permission level to access the page.
+            navbar_init($app, $user, $is_auth);
+            if ($app->get_session_message("perm") == 3) {  // Check if the user has the correct permission level to access the page.
                 // User is authenticated to level 3 (admin/superuser/boss)
+                $app->set_csrftoken();
                 $app->render(LAYOUT, "signup");
                 exit();
             } else {
@@ -110,7 +114,7 @@ get("/signup", function($app) {
     }    
 });
 
-post("/signup", function($app) {
+put("/signup", function($app) {
     $email = $app->form("email", "email");
     $pwd = $app->form("pwd");
     $pwd_conf = $app->form("pwdConf");
@@ -121,6 +125,14 @@ post("/signup", function($app) {
     $app->set_message("email", ($email != false) ? $email : "");
     $app->set_message("fname", ($fname != false) ? $fname : "");
     $app->set_message("lname", ($lname != false) ? $lname : "");
+
+    
+    // Check if Csrf token is valid.
+    if (!$app->check_csrftoken($app->form("token"))) {
+        $app->set_flash("Invalid Authentication token. Please try again.");
+        $app->render("blank", "signin");
+    }
+
     try {
 
         $user = new User();
@@ -191,6 +203,7 @@ get("/addarticle", function($app) {
             // $username = $app->get_session_message("name");
             // $app->set_message("username", $username);
             navbar_init($app, $user, $is_auth);
+            $app->set_csrftoken();
             $app->render(LAYOUT, "addarticle");
         } else {
             $app->set_flash("You are not authorised");
@@ -225,12 +238,20 @@ put("/addarticle", function($app) {
             $title = $app->form("title");
             $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
+            $csrf_token = $app->form("token");
 
             /* Commented out for AJAX testing */
             // $app->set_message("title", ($title != false) ? $title : "");
             // $app->set_message("keywords", ($keywords != false) ? $keywords : "");
             // $app->set_message("article_content", ($article_content != false) ? $article_content : "");
 
+            if (!$app->check_csrftoken($csrf_token)) {
+                // CSRF token failure.
+                $app->set_message("result", 0);
+                $app->set_message("html", "Invalid authentication token. Please refresh the page.");
+                $app->render(NULL, "addarticle.json");
+                exit();
+            }
 
             if ($title === false || $keywords === false || $article_content === false) {
                 // $app->set_flash("Please fill all fields.");

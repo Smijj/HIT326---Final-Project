@@ -17,11 +17,16 @@
         </a>
 
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-          <li><a href="/" class="nav-link px-2 text-secondary">Home</a></li>
+          <li><a href="/" class="nav-link px-2 text-white">Home</a></li>
           <li><a href="/articlelist" class="nav-link px-2 text-white">Article List</a></li>
           <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
           <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
           <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+          <?php
+            if (!empty($perm) && $perm == 3) {
+              echo "<li><a href=\"/signup\" class=\"nav-link px-2 text-white\">Add new user</a></li>";
+            }
+          ?>
         </ul>
         <?php
           if (!empty($name)) {
