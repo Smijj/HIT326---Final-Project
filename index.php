@@ -299,7 +299,8 @@ get("/article/:id;[\d]+", function($app) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
     }
-    if ($data !== false) {
+    if ($data !== false && $data->public === true) {
+
         $app->set_message("articles_data", $data);
         $app->render(LAYOUT, "article");
     } else {

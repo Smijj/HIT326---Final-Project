@@ -4,7 +4,7 @@
 </style>
 <main>
     <div id="error-div">
-        <a href="index"><img id="error-img" src="/img/logo1.png"></a><br>
+        <a href="/"><img id="error-img" src="/img/logo1.png"></a><br>
         <p>
             <span style="font-size:20px;padding-bottom:20px">Error 403: Access Denied</span><br>
             <?php

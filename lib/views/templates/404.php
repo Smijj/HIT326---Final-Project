@@ -3,7 +3,7 @@
 </style>
 <main>
     <div id="error-div">
-        <a href="index"><img id="error-img" src="/img/logo1.png"></a><br>
+        <a href="/"><img id="error-img" src="/img/logo1.png"></a><br>
         <p>
             <span id="errorTitle">Error 404: Page not Found</span><br>
             <?php
