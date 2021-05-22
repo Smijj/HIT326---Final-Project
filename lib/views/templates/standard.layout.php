@@ -31,7 +31,7 @@
         </ul>
         <?php
           if (!empty($name)) {
-            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><p style='margin:auto;'>{$name}</p></div>";
+            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><a href=\"editAccount\"><p style='margin:auto;'>{$name}</p></a></div>";
           }
             // <!-- <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> -->
         ?>

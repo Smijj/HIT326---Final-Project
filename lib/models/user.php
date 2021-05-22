@@ -20,6 +20,18 @@ class AuthException extends Exception {
     }
 }
 
+class userdata {
+    public string $uid, $fname, $lname, $email, $perm;
+
+    public function __construct($uid = null, $fname = null, $lname = null, $email = null, $perm = null) {
+        $this->uid = $uid;
+        $this->fname = $fname;
+        $this->lname = $lname;
+        $this->email = $email;
+        $this->perm = $perm;
+    }
+}
+
 class User extends Database {
     
     /**
@@ -71,7 +83,7 @@ class User extends Database {
      */
     public function get_users() {
         try {
-           $query = "SELECT id, name FROM users";
+           $query = "SELECT user_id, name FROM users";
            if ($statement = $this->prepare($query)) {
                 if(!$statement -> execute()){
                     throw new Exception("Could not execute query.");
@@ -83,6 +95,29 @@ class User extends Database {
                 throw new DBException("Could not prepare statement.");
             }
         } catch(Exception $e) {
+            throw new Exception($e->getMessage());
+        }
+    }
+
+    public function get_user(): userdata {
+        $sql = "SELECT fname, lname, email, perm FROM users WHERE user_id = ?";
+        $user_id = (isset($_SESSION["uid"])) ? $_SESSION["uid"] : null;
+        if ($user_id == null) {
+            return new userdata();
+        }
+        try {
+            if ($stmt = $this->prepare($sql)) {
+                if(!$stmt -> execute(array($user_id))){
+                    throw new Exception("Could not execute query.");
+                } else {
+                    $results = $stmt->fetch(PDO::FETCH_ASSOC);
+                    return new userdata($user_id, $results['fname'], $results['lname'], $results['email'], $results['perm']);
+                }
+            } else {
+                throw new DBException("Could not prepare statement.");
+            }
+
+        } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }
     }
@@ -126,6 +161,49 @@ class User extends Database {
                 return true;
             } else {
                 throw new Exception('Internal error when adding user. Please try again later.');
+            }
+        }
+    }
+
+    public function updateUser($email, $fname, $lname, $pwd) {
+        if (empty($email) || empty($fname) || empty($lname)) {
+            throw new Exception('Empty field');
+        }
+        $user_id = $this->get_user_id();
+        // Set-up and execute a prepared sql statement to get all users with matching emails.
+        $sql = "SELECT user_id FROM users WHERE email=? AND NOT user_id = ?";
+        $stmt = $this->prepare($sql);
+        $stmt->execute(array($email, $user_id));
+        
+        // If the count is 1 or more, the email is already in use.
+        $count = $stmt->rowCount();
+        if ($count > 0) {
+            throw new Exception('Username currently in use.');
+        } else {
+            if ($pwd != "") {
+                if (strlen($pwd) <= 8) {
+                    throw new Exception('Password should be larger than 8 characters.');
+                }
+                // Hash password.
+                // $pwd_peppered = $this->generate_pepper_hash($pwd);
+                $pwd_hashed = password_hash($pwd, PASSWORD_DEFAULT);
+                $sql = "UPDATE users SET fname = ?, lname = ?, email = ?, pwd = ? WHERE user_id = ?";
+                $variables = array($fname, $lname, $email, $pwd, $user_id);
+            } else {
+                $sql = "UPDATE users SET fname = ?, lname = ?, email = ? WHERE user_id = ?";
+                $variables = array($fname, $lname, $email, $user_id);
+            }
+            
+            // Set-up and execute a prepared sql statement to insert the new user into the database.
+            if ($stmt = $this->prepare($sql)) {
+                if ($stmt->execute($variables)) {
+                    $this->set_authenticated_session($user_id, $fname." ".$lname, $_SESSION["perm"], ($pwd != "") ? $pwd : $_SESSION["hash"]);
+                    return true;
+                } else {
+                    throw new Exception('Internal error when adding user. Please try again later.');
+                }
+            } else {
+                throw new DBException("Could not perpare sql statement.");
             }
         }
     }

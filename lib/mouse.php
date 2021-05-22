@@ -261,7 +261,7 @@ class Mouse{
     * @param string $key Key of value to return.
     * @param string $datatype Specify type of data.
     *
-    * @return string Returns false if key not found.
+    * @return string Returns empty string if key not found.
     */
    public function form($key, $datatype = "") {
       if(!empty($_POST[$key])){
@@ -275,7 +275,7 @@ class Mouse{
          }
          return $value;
       }
-      return false;
+      return "";
    }
 
    public function redirect_to($path="/") {

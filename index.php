@@ -66,7 +66,7 @@ post("/signin", function($app) {
     $pwd = $app->form("pwd");
     $app->set_message("email", ($email) ? $email : "");     // Pass email (if entered) back to sign-in page to display on error.
 
-    if ($email && $pwd) {                                   // Check if both variables were given.
+    if ($email != "" && $pwd != "") {                                   // Check if both variables were given.
         $user = new User();                                 // Create new User class.
         try {
             if ($user->sign_in($email, $pwd)) {             // Try to sign in using provided credentials.
@@ -102,6 +102,7 @@ get("/signup", function($app) {
             }
         } elseif ($user->is_db_empty() === true) {                          // Check if DB is empty.
             $app->set_message("db_empty", true);
+            $app->set_message("perm", 3);
             $app->set_flash("No users in DB please create an admin now.");  // Display page anyway if there's no users to signin.
             $app->set_csrftoken();
             $app->render(LAYOUT, "signup");
@@ -126,15 +127,16 @@ put("/signup", function($app) {
     $lname = $app->form("lname");
     $perm = $app->form("perm");
 
-    $app->set_message("email", ($email != false) ? $email : "");
-    $app->set_message("fname", ($fname != false) ? $fname : "");
-    $app->set_message("lname", ($lname != false) ? $lname : "");
+    $app->set_message("email", $email);
+    $app->set_message("fname", $fname);
+    $app->set_message("lname", $lname);
 
     
     // Check if Csrf token is valid.
     if (!$app->check_csrftoken($app->form("token"))) {
         $app->set_flash("Invalid Authentication token. Please try again.");
         $app->render("blank", "signup");
+        exit();
     }
 
     try {
@@ -143,7 +145,7 @@ put("/signup", function($app) {
         if ($is_auth = $user->is_authenticated() === true || $db_empty = $user->is_db_empty() === true) {
             navbar_init($app, $user, $is_auth);
 
-            if ($email === false || $pwd === false || $pwd_conf === false || $fname === false || $lname === false || $perm === false) {
+            if ($email == "" || $pwd == ""  || $pwd_conf == ""  || $fname == ""  || $lname == "" || $perm == "" ) {
                 $app->set_flash("Please fill all fields.");
                 $app->render(LAYOUT, "signup");
                 exit();
@@ -259,7 +261,7 @@ put("/addarticle", function($app) {
                 exit();
             }
 
-            if ($title === false || $keywords === false || $article_content === false) {
+            if ($title == "" || $keywords == "" || $article_content == "") {
                 // $app->set_flash("Please fill all fields.");
                 // $app->render(LAYOUT, "addarticle");
                 $app->set_message("result", 0);
@@ -355,6 +357,83 @@ get("/article/:id;[\d]+", function($app) {
         $app->render(LAYOUT, "article");
     } else {
         $app->render(LAYOUT, "404");
+        exit();
+    }
+});
+
+get("/editAccount", function($app) {
+    $user = new User();
+    $is_auth = $user->is_authenticated();
+    navbar_init($app, $user, $is_auth);
+    if ($is_auth == true) {
+        $data = $user->get_user();
+        foreach ($data as $key => $value) {
+            $app->set_message($key, $value);
+        }
+        $app->set_csrftoken();
+        $app->render(LAYOUT, "editAccount");
+    }
+});
+
+post("/editAccount", function($app) {
+    $user = new User();
+    $is_auth = $user->is_authenticated();
+    navbar_init($app, $user, $is_auth);
+
+    if ($is_auth == true) {
+        $email = $app->form("email", "email");
+        $pwd = $app->form("pwd");
+        $pwd_conf = $app->form("pwdConf");
+        $fname = $app->form("fname");
+        $lname = $app->form("lname");
+        $perm = $app->form("perm");
+
+        $app->set_message("email", $email);
+        $app->set_message("fname", $fname);
+        $app->set_message("lname", $lname);
+
+        
+        // Check if Csrf token is valid.
+        if (!$app->check_csrftoken($app->form("token"))) {
+            $app->set_flash("Invalid Authentication token. Please try again.");
+            $app->redirect_to("editAccount");
+            exit();
+        }
+
+        if ($email == "" || $fname == ""  || $lname == "" || $perm == "" ) {
+            $app->set_flash("Please fill all fields.");
+            $app->redirect_to("editAccount");
+            exit();
+        } else {
+            if (!filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL)) {
+                $email = "";
+                $app->set_flash("Invalid email. Please supply a valid email address.");
+                $app->redirect_to("editAccount");
+            } elseif ($pwd === $pwd_conf){
+                $user = new User();
+                try {
+                    if ($user->is_db_empty()) { $perm = 3; }                        // Set permission level to 3 regardless of what user submitted (only for first user).
+                     if ($user->updateUser($email, $fname, $lname, $pwd, $perm)) {
+                        $app->set_flash("Successfully updated account.");
+                        $app->redirect_to("editAccount");
+                     } else {
+                        $app->set_flash("Internal Error. Please try again later.");
+                        $app->redirect_to("editAccount");
+                     }
+                } catch (Exception $e) {
+                    $app->set_flash("Error: ".$e->getMessage());
+                    $app->redirect_to("editAccount");
+                }
+                exit();
+            } else {
+                $app->set_flash("Passwords do not match");
+                $app->redirect_to("editAccount");
+                exit();
+            }
+        }
+
+    } else {
+        $app->render(LAYOUT, "403");
         exit();
     }
 });
