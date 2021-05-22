@@ -1,7 +1,18 @@
+:root {
+    --bg_colour: blanchedalmond;
+    --article_bg_colour: 
+}
+
+html, body {
+    background-color: var(--bg_colour);
+}
+
+
+
 html.center-html,
 body.center-body { 
     height: 100%;
-    width: 100%;
+    width: 100%
 }
 .center-parent {
     height: 200px;
@@ -12,4 +23,42 @@ body.center-body {
 .center-child {
     width: 100px;
     height: 100px;
+}
+
+
+
+/* Standard Layout Styles */
+#content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* ARTICLE LIST PAGE STYLES */
+
+.article_list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border: solid 2px black;
+    
+    margin: 10px 0 10px 0;
+    padding: 5px;
+
+    min-width: 400px;
+    width: 40%;
+}
+.article_list_header {
+    margin: 5px 0 10px 0;
+}
+.article_list_subheader {
+    margin: 0;
+}
+.article_list_keywords {
+    margin: 0;
+}
+
+.article_list:hover {
+    border: dotted 2px black;
 }
