@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="center-html">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,9 +7,11 @@
     <link rel="stylesheet" href="/css/style.css">
     <title></title>
 </head>
-<body>
-    <div class="center">
-        <?php if(isset($content)) { require $content; } ?>
+<body class="center-body">
+    <div class="center-parent">
+        <div class="center-child">
+            <?php if(isset($content)) { require $content; } ?>
+        </div>
     </div>
 </body>
 </html>
