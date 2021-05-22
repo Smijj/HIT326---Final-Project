@@ -57,16 +57,21 @@ class Article extends Database {
      * Can return DBException on DB error.
      *
      * @param  string $id
+     * @param  bool $to_html when true, converts line endings to html "<br/>" tags.
      * @return articleData Returns boolean **False** on fail/not found.
      */
-    public function get_article($id): articleData {
+    public function get_article($id, $to_html = false): articleData {
         if (!empty($id)) {
             $sql = "SELECT title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id AND article_id=?";
             $stmt = $this->prepare($sql);
             if($stmt->execute(array($id))) {
                 $result = $stmt->fetch(PDO::FETCH_ASSOC);
                 if (!empty($result)) {
-                    return new articleData($result['title'], $result['content'], $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
+                    $article_content = $result['content'];
+                    if ($to_html == true) {
+                        $article_content = nl2br($article_content);     // Replaces new line codes with html ones.
+                    }
+                    return new articleData($result['title'], $article_content, $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
                 } else {
                     return false;
                 }

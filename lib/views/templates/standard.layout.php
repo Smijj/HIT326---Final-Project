@@ -25,7 +25,7 @@
         </ul>
         <?php
           if (!empty($name)) {
-            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><!--<img src='/static/user-profile.svg' alt='user icon' style='max-width:50px; max-height:auto;'/>--!><p style='margin:auto;'>{$name}</p></div>";
+            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><p style='margin:auto;'>{$name}</p></div>";
           }
             // <!-- <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> -->
         ?>
