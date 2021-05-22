@@ -217,7 +217,9 @@ class User extends Database {
                     // $pwd_peppered = $this->generate_pepper_hash($pwd_hashed);
                     if (password_verify($pwd, $pwd_hashed)) {
                         // Success
-                        $this->set_authenticated_session($row['user_id'], $row['fname']." ".$row['lname'], $row['perm'], $row['pwd']);
+                        $name = $row['fname']." ";
+                        if ($row['lname'] != '.') { $name .= $row["lname"]; }           // Add last name if not '.' (meaning the user has no last name).
+                        $this->set_authenticated_session($row['user_id'], $name, $row['perm'], $row['pwd']);
                         return true;
                     } else {
                         throw new Exception('Invalid Username or Password');
