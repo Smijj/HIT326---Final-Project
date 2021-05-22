@@ -267,7 +267,7 @@ class Mouse{
       if(!empty($_POST[$key])){
          switch ($datatype) {
             case "email":
-                  $value = filter_input(INPUT_POST, $key, FILTER_SANITIZE_EMAIL);
+               $value = filter_input(INPUT_POST, $key, FILTER_SANITIZE_EMAIL);
                break;
             default:
                $value = sanitise_str($_POST[$key]);

@@ -309,7 +309,8 @@ get("/article/:id;[\d]+", function($app) {
     $article = new Article();
     navbar_init($app);
     try {
-        $data = $article->get_article($app->route_var('id'));
+        $data = $article->get_article($app->route_var('id'), true);
+
     } catch (DBException $e) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
