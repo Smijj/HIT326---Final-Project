@@ -89,22 +89,35 @@ class Article extends Database {
 
 
     /**
-     * Return **article_list** class with data of all articles in the article table or empty if nothing found.
-     * 
-     * Can return DBException on DB error.
      *
      * @return output Returns boolean **False** on fail/not found.
      */
-
-    public function article_list() {
+    
+    /**
+     * Return **articleData[]** class with data of all articles in the article table or empty if nothing found.
+     * 
+     * Can return DBException on DB error.
+     *
+     * @param  int $list_length Amount of articles to get, 0 for all.
+     * @param  bool $only_public When true, returns only public articles.
+     * @return articleData[] Returns boolean **False** on fail/not found.
+     */
+    public function article_list($list_length = 0, $only_public = false) {
         $output[] = null;
         $sql = "SELECT article_id, author_id, title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id ORDER BY creation_date DESC";
         $stmt = $this->prepare($sql);
         if($stmt->execute()) {
             $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
             if (!empty($result)) {
+                $article_count = 0;
                 foreach ($result as $key => $value) {
-                    $output[$key] = new articleData($value['article_id'], $value['author_id'], $value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
+                    if ($list_length != 0 && $article_count > $list_length) {
+                        break;                                                  // Break foreach loop if requested article amount is reached.
+                    }
+                    if (($only_public == true && $value['public'] == true) || $only_public != true) { // Only add article if only_visible is true and it is visible, or only_visible is false. 
+                        if ($list_length != 0) { $article_count++; }            // If limit on article amount increment counter.
+                        $output[$key] = new articleData($value['article_id'], $value['author_id'], $value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
+                    }
                 }
                 return $output;
             } else {

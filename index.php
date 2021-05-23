@@ -49,9 +49,10 @@ get("/", function($app) {
         exit();                                             // Ensure all code execution stops here.
     } catch (Exception $e) {
         $app->set_flash("Internal Error. Please try again later.");
-    } finally {
-        $app->render(LAYOUT, "mainpage");                   // Render the mainpage.
     }
+    $article = new article();
+    $app->set_message("top5articles", $article->article_list(5), true); // Get the top 5 articles.
+    $app->render(LAYOUT, "mainpage");                   // Render the mainpage.
 
 });
 
