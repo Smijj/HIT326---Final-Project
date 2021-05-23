@@ -31,8 +31,8 @@
           ?>
         </ul>
         <?php
-          if (!empty($name)) {
-            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><a href=\"editAccount\"><p style='margin:auto;'>{$name}</p></a></div>";
+          if (!empty($nav_name)) {
+            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><a href=\"editAccount\"><p style='margin:auto;'>{$nav_name}</p></a></div>";
           }
             // <!-- <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> -->
         ?>
@@ -52,7 +52,7 @@
     </header>
     
     <section id="content">
-      <?php if (!empty($content)) { require $content; } ?>
+      <?php if (!empty($page_content)) { require $page_content; } ?>
     </section>
 
 </body>

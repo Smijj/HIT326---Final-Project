@@ -179,14 +179,14 @@ class Mouse{
 
       $flash = $this->get_flash();
 
-      $content = VIEWS."templates/{$content}.php";
+      $page_content = VIEWS."templates/{$content}.php";
       
       if(!empty($layout)) {
          require VIEWS."templates/{$layout}.layout.php";
       } else {
          // AJAX response.
          header('Content-Type: application/json');
-         require $content;
+         require $page_content;
          echo json_encode($data);
       }
       exit();

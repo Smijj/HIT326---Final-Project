@@ -4,7 +4,7 @@ class articleData {
     public int $article_id;
     public int $author_id;
     public string $title;
-    public string $content;
+    public string $article_content;
     public string $keywords;
     public string $date_last_edit;
     public bool $public;
@@ -23,11 +23,11 @@ class articleData {
      * @param  string $name
      * @return void
      */
-    public function __construct($article_id = null, $author_id = null, $title = null, $content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
+    public function __construct($article_id = null, $author_id = null, $title = null, $article_content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
         $this->article_id = $article_id;
         $this->author_id = $author_id;
         $this->title = $title;
-        $this->content = $content;
+        $this->article_content = $article_content;
         $this->keywords = $keywords;
         $this->date_last_edit = $date_last_edit;
         $this->public = $public;
@@ -66,7 +66,7 @@ class Article extends Database {
      * @param  bool $to_html when true, converts line endings to html "<br/>" tags.
      * @return articleData Returns boolean **False** on fail/not found.
      */
-    public function get_article($id, $to_html = false): articleData {
+    public function get_article($id, $to_html = false) {
         if (!empty($id)) {
             $sql = "SELECT article_id, author_id, title, keywords, content, update_date, public, users.fname, users.lname FROM articles, users WHERE articles.author_id = users.user_id AND article_id=?";
             $stmt = $this->prepare($sql);
@@ -127,5 +127,19 @@ class Article extends Database {
         return false;
     }
 
-
+    public function update_article($id, $title, $keywords, $article_content, $public) {
+        if (empty($title) || empty($keywords) || empty($article_content)) {
+            throw new Exception('Empty field');
+        }
+    
+    
+        // Set-up and execute a prepared sql statement to insert the new article into the database.
+        $sql = "";
+        $stmt = $this->prepare($sql);
+        if ($stmt->execute(array($id, $title, $keywords, $article_content, $public))) {
+            return true;
+        } else {
+            throw new Exception('Internal error when updating article. Please try again later.');
+        }
+    }
 }

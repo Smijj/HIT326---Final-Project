@@ -372,6 +372,81 @@ get("/articlelist", function($app) {
     }
 });
 
+get("/editarticle/:id;[\d]+", function($app) {
+    $app->force_to_https("/editarticle/".$app->route_var("id"));
+
+    $user = new User();
+    $is_auth = $user->is_authenticated();
+    navbar_init($app, $user, $is_auth);
+    if ($is_auth == true) {
+        $article = new Article();
+        $article_data = $article->get_article($app->route_var("id"));
+
+        if ($article_data != false && !empty($article_data)) {
+            foreach ($article_data as $key => $value) {
+                $app->set_message($key, $value);
+            }
+            $app->set_csrftoken();
+            $app->render(LAYOUT, "editarticle");
+        } else {
+            $app->render(LAYOUT, "404");
+        }
+    } else {
+        $app->render(LAYOUT, "403");
+    }
+});
+
+// EditArticle post function: AJAX
+post("/editarticle/:id;[\d]+", function($app) {
+    $user = new User();
+    $id = $app->route_var("id");
+    try {
+        $is_auth = $user->is_authenticated();
+        navbar_init($app, $user, $is_auth);
+        if ($is_auth == true) {
+            $title = $app->form("title");
+            $keywords = $app->form("keywords");
+            $article_content = $app->form("article_content");
+            $public = ($app->form("public") == "public_true") ? true : false; // 'public' is a checkbox and does not return a value if unticked.
+            $csrf_token = $app->form("token");
+
+            if (!$app->check_csrftoken($csrf_token)) {
+                // CSRF token failure.
+                $app->set_message("result", 0);
+                $app->set_message("html", "Invalid authentication token. Please refresh the page.");
+                $app->render(NULL, "editarticle.json");
+                exit();
+            }
+            if ($title == "" || $keywords == "" || $article_content == "") {
+                $app->set_message("result", 0);
+                $app->set_message("html", "Please fill all fields.");
+                $app->render(NULL, "editarticle.json");
+                exit();
+            } else {
+                $article = new Article();
+                try {
+                    $article->update_article($id, $title, $keywords, $article_content, $public);
+                    // $app->set_flash("Success");
+                    // $app->redirect_to("/");
+                    $app->set_message("result", 1);
+                    $app->render(NULL, "editarticle.json");
+                } catch (Exception $e) {
+                    // $app->set_flash("Error: ".$e->getMessage());
+                    // $app->render(LAYOUT, "addarticle");
+                    $app->set_message("result", 0);
+                    $app->set_message("html", "Internal Error: ".$e->getMessage());
+                    $app->render(NULL, "editarticle.json");
+                }
+                exit();
+            } 
+
+        } else {
+            $app->render(LAYOUT, "403");
+        }
+    } catch (Exception $e) {
+        $app->set_flash("An internal error has occurred: ".$e->getMessage());
+    }
+});
 
 get("/article/:id;[\d]+", function($app) {
     $app->force_to_https("/signin");
