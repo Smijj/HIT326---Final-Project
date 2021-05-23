@@ -7,4 +7,4 @@ if (!isset($articles_data->title)) {
 <p class="author"><?php echo $articles_data->name; ?></p>
 <p class="keywords"><?php echo $articles_data->keywords; ?></p>
 <p class="last_edit_date"><?php echo $articles_data->date_last_edit; ?></p>
-<p class="article_content"><?php echo $articles_data->content; ?></p>
+<p class="article_content"><?php echo $articles_data->article_content; ?></p>

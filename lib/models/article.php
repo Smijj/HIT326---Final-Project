@@ -127,16 +127,22 @@ class Article extends Database {
         return false;
     }
 
-    public function update_article($id, $title, $keywords, $article_content, $public) {
+    public function update_article($id, $title, $keywords, $article_content, $public = null) {
         if (empty($title) || empty($keywords) || empty($article_content)) {
             throw new Exception('Empty field');
         }
     
+        if ($public != null) {
+            $sql = "UPDATE articles SET title=?, keywords=?, content=?, public=? WHERE article_id=?";
+            $variables = array($title, $keywords, $article_content, $public, $id);
+        } else {
+            $sql = "UPDATE articles SET title=?, keywords=?, content=? WHERE article_id=?";
+            $variables = array($title, $keywords, $article_content, $id);
+        }
     
         // Set-up and execute a prepared sql statement to insert the new article into the database.
-        $sql = "";
         $stmt = $this->prepare($sql);
-        if ($stmt->execute(array($id, $title, $keywords, $article_content, $public))) {
+        if ($stmt->execute($variables)) {
             return true;
         } else {
             throw new Exception('Internal error when updating article. Please try again later.');

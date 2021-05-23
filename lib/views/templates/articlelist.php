@@ -18,7 +18,7 @@
                         <p class='article_list_keywords'>Keywords: {$article_data->keywords}</p>";
             if ($high_level_user == true) {
                 echo "<div class='article_list_buttons'>
-                        <div data-href='#'>Edit</div>
+                        <div data-href='/editarticle/{$article_data->article_id}'>Edit</div>
                         <div data-href='#'>Delete</div>
                     </div>
                 </article>";

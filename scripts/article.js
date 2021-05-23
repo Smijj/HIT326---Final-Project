@@ -34,7 +34,8 @@ $( function() {
         event.preventDefault();                                                 // Stop the automatic submission of thee form.
         var data = $(this).serialize();                                         // Get all of the form data serialised.
         // Post the data to the sever.
-        $.post($(location).attr("pathname"), data,
+        // $.post($(location).attr("pathname"), data,
+        $.post("/editarticle/18", data,
             function (data, textStatus, jqXHR) {
                 if (data != undefined && data.result != undefined && data.html != undefined) {
                     if (data.result == 1) {

@@ -407,8 +407,14 @@ post("/editarticle/:id;[\d]+", function($app) {
             $title = $app->form("title");
             $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
-            $public = ($app->form("public") == "public_true") ? true : false; // 'public' is a checkbox and does not return a value if unticked.
             $csrf_token = $app->form("token");
+
+            // If the user is not privileged to set the public bool, set to null to keep the same.
+            if ($app->get_session_message("perm") >= 2) {
+                $public = ($app->form("public") == "public_true") ? true : false; // 'public' is a checkbox and does not return a value if unticked.
+            } else {
+                $public = null;
+            }
 
             if (!$app->check_csrftoken($csrf_token)) {
                 // CSRF token failure.
