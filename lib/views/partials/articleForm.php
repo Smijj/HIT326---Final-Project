@@ -1,4 +1,4 @@
-<label for="author">Author: <?php echo "{$name} \n"; ?></label><br>
+<label for="author">Author: <?php echo "{$nav_name} \n"; ?></label><br>
 <label for="title">Title:</label>
 <input type="title" name="title" id="title" value="<?php if (isset($title)) {echo $title;} ?>" autocomplete="title"><br>
 <label for="keywords">Keywords:</label>

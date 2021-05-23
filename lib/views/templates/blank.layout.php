@@ -10,7 +10,7 @@
 <body class="center-body">
     <div class="center-parent">
         <div class="center-child">
-            <?php if(isset($content)) { require $content; } ?>
+            <?php if(isset($page_content)) { require $page_content; } ?>
         </div>
     </div>
 </body>
