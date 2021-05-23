@@ -1,12 +1,21 @@
 <label for="fname">First Name:</label>
-<input type="text" name="fname" id="fname" value="<?php if (!empty($fname)) { echo $fname; } ?>" autocomplete="given-name"><br>
+<input type="text" name="fname" id="fname" value="<?php if (!empty($fname)) { echo $fname; } ?>" autocomplete="given-name"/><br>
 <label for="lname">Last name</label>
-<input type="text" name="lname" id="lname" value="<?php if (!empty($lname)) { echo $lname; } ?>" autocomplete="family-name"><br>
+<input type="text" name="lname" id="lname" value="<?php if (!empty($lname)) { echo $lname; } ?>" autocomplete="family-name"/><br>
 <label for="email">Email:</label>
-<input type="email" name="email" id="email" value="<?php if (!empty($email)) {echo $email;} ?>" autocomplete="email"><br>
+<input type="email" name="email" id="email" value="<?php if (!empty($email)) {echo $email;} ?>" autocomplete="email"/><br>
 <label for="pwd">Password:</label>
-<input type="password" name="pwd" id="pwd" autocomplete="new-password"><br>
+<input type="password" name="pwd" id="pwd" autocomplete="new-password"/><br>
 <label for="pwdConf">Confirm password</label>
 <input type="password" name="pwdConf" id="pwdConf" autocomplete="new-password"/><br>
 <label for="perm">Permission Level:</label>
-<input type="text" name="perm" id="prem" <?php if (!empty($perm)) { echo "value=\"{$perm}\" readonly"; } ?>><br>
+<input type="text" name="perm" id="prem" <?php
+                                        if (!empty($perm_form)) {
+                                            // If the user has entered permission level before, enter it now / enter perset if DB empty.
+                                            echo "value=\"{$perm_form}\"";
+                                        } 
+                                        if (!empty($lockperm) && $lockperm == true) {
+                                            // If the DB is empty disable the user from changing this value.
+                                            echo " readonly";
+                                            }
+                                        ?>/><br>

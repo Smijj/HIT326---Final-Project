@@ -188,7 +188,7 @@ class User extends Database {
                 // $pwd_peppered = $this->generate_pepper_hash($pwd);
                 $pwd_hashed = password_hash($pwd, PASSWORD_DEFAULT);
                 $sql = "UPDATE users SET fname = ?, lname = ?, email = ?, pwd = ? WHERE user_id = ?";
-                $variables = array($fname, $lname, $email, $pwd, $user_id);
+                $variables = array($fname, $lname, $email, $pwd_hashed, $user_id);
             } else {
                 $sql = "UPDATE users SET fname = ?, lname = ?, email = ? WHERE user_id = ?";
                 $variables = array($fname, $lname, $email, $user_id);
@@ -197,7 +197,7 @@ class User extends Database {
             // Set-up and execute a prepared sql statement to insert the new user into the database.
             if ($stmt = $this->prepare($sql)) {
                 if ($stmt->execute($variables)) {
-                    $this->set_authenticated_session($user_id, $fname." ".$lname, $_SESSION["perm"], ($pwd != "") ? $pwd : $_SESSION["hash"]);
+                    $this->set_authenticated_session($user_id, $fname." ".$lname, $_SESSION["perm"], ($pwd != "") ? $pwd_hashed : $_SESSION["hash"]);
                     return true;
                 } else {
                     throw new Exception('Internal error when adding user. Please try again later.');
@@ -344,17 +344,15 @@ class User extends Database {
     public function is_db_empty() {
         try {
             $sql = "SELECT user_id FROM users";
-            if ($stmt = $this->prepare($sql)) {
-                if ($stmt->execute()) {
-                    $result = $stmt->rowCount();
-                    if ($result === 0) {
+            if ($stmt = $this->query($sql)) {
+                    // fetchColumn() returns false if the first row returned is nothing, hence empty database.
+                    $result = $stmt->fetchColumn(0);
+                    if ($result == false) {
                         return true;
                     } else {
                         return false;
                     }
-                } else {
-                    throw new DBException("Could not prepare statement.");
-                }
+
             }
         } catch (DBException $e) {
             throw new DBException($e->getMessage());

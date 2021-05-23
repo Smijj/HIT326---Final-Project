@@ -34,6 +34,10 @@ body.center-body {
     align-items: center;
 }
 
+/* ADD ARTICLE STYLES */
+.article_form {
+    padding: 10px;
+}
 
 /* ARTICLE LIST PAGE STYLES */
 

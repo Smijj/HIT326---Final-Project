@@ -101,8 +101,9 @@ get("/signup", function($app) {
                 exit();                                                     // Ensure that code execution stops here.
             }
         } elseif ($user->is_db_empty() === true) {                          // Check if DB is empty.
-            $app->set_message("db_empty", true);
-            $app->set_message("perm", 3);
+            $user->signout();                                               // Ensure all session variables are clear (catches case where DB is emptied while user is logged in).
+            $app->set_message("lockperm", true);
+            $app->set_message("perm_form", 3);
             $app->set_flash("No users in DB please create an admin now.");  // Display page anyway if there's no users to signin.
             $app->set_csrftoken();
             $app->render(LAYOUT, "signup");
@@ -130,19 +131,29 @@ put("/signup", function($app) {
     $app->set_message("email", $email);
     $app->set_message("fname", $fname);
     $app->set_message("lname", $lname);
+    $app->set_message("perm_form", $perm);
 
     
     // Check if Csrf token is valid.
     if (!$app->check_csrftoken($app->form("token"))) {
         $app->set_flash("Invalid Authentication token. Please try again.");
-        $app->render("blank", "signup");
+        $app->render(LAYOUT, "signup");
         exit();
     }
 
     try {
 
         $user = new User();
-        if ($is_auth = $user->is_authenticated() === true || $db_empty = $user->is_db_empty() === true) {
+        $is_auth = $user->is_authenticated();
+        $db_empty = $user->is_db_empty();
+
+        if ($is_auth == true || $db_empty == true) {
+            if($db_empty) {
+                $is_auth = false;
+                $app->set_message("lockperm", true);
+                $app->set_message("perm", 3);
+            }
+            $app->set_csrftoken();
             navbar_init($app, $user, $is_auth);
 
             if ($email == "" || $pwd == ""  || $pwd_conf == ""  || $fname == ""  || $lname == "" || $perm == "" ) {
@@ -151,14 +162,18 @@ put("/signup", function($app) {
                 exit();
             } else {
                 if (!filter_input(INPUT_POST, "email", FILTER_VALIDATE_EMAIL)) {
-                    $email = "";
                     $app->set_flash("Invalid email. Please supply a valid email address.");
+                    $app->render(LAYOUT, "signup");
+                } elseif (!preg_match("/^[0-3]$/", $perm)) {
+                    $app->set_message("perm", "");
+                    $app->set_flash("Invalid permission. Please supply a number between 0 and 3.");
                     $app->render(LAYOUT, "signup");
                 } elseif ($pwd === $pwd_conf){
                     $user = new User();
                     try {
-                        if ($user->is_db_empty()) { $perm = 3; }                        // Set permission level to 3 regardless of what user submitted (only for first user).
+                        if ($db_empty) { $perm = 3; }                        // Set permission level to 3 regardless of what user submitted (only for first user).
                         $user->registerUser($email, $fname, $lname, $pwd, $perm);
+                        $user->signout();
                         $app->set_flash("Success");
                         $app->redirect_to("/");
                     } catch (Exception $e) {
@@ -409,6 +424,7 @@ get("/editAccount", function($app) {
         foreach ($data as $key => $value) {
             $app->set_message($key, $value);
         }
+        $app->set_message("lockperm", true);
         $app->set_csrftoken();
         $app->render(LAYOUT, "editAccount");
     }
@@ -431,6 +447,7 @@ post("/editAccount", function($app) {
         $app->set_message("fname", $fname);
         $app->set_message("lname", $lname);
 
+        $app->set_message("lockperm", true);
         
         // Check if Csrf token is valid.
         if (!$app->check_csrftoken($app->form("token"))) {

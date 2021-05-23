@@ -23,11 +23,20 @@ class Database {
     }
 
     
-    public function prepare($query) {
+    public function prepare($sql) {
         try {
-            return self::$conn->prepare($query);
+            return self::$conn->prepare($sql);
         } catch (PDOException $e) {
             throw new Exception("ERROR: Could not prepare the query: {$e->getMessage()}");
+        }
+    }
+    
+    public function query($sql) {
+        try {
+            return self::$conn->query($sql);
+        } catch (PDOException $e) {
+            // Only throws exception if "PDO::ATTR_ERRMODE" = "PDO::ERRMODE_EXCEPTION".
+            throw new DBException("ERROR: Could not query database: {$e->getMessage()}");
         }
     }
 }

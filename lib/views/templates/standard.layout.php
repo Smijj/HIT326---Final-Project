@@ -25,7 +25,7 @@
           <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
           <li><a href="#" class="nav-link px-2 text-white">About</a></li>
           <?php
-            if (!empty($perm) && $perm == 3) {
+            if (!empty($nav_perm) && $nav_perm == 3) {
               echo "<li><a href=\"/signup\" class=\"nav-link px-2 text-white\">Add new user</a></li>";
             }
           ?>

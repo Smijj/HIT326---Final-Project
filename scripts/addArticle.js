@@ -1,5 +1,5 @@
 $( function() {
-    $("#addArticleForm").submit( function(event) {
+    $("#add_article_form").submit( function(event) {
         event.preventDefault();                                                 // Stop the automatic submission of thee form.
         var data = $(this).serialize();                                         // Get all of the form data serialised.
         // Post the data to the sever.
@@ -8,8 +8,8 @@ $( function() {
                 if (data != undefined && data.result != undefined && data.html != undefined) {
                     if (data.result == 1) {
                         // Successfully added to the database.
-                        $(".ArticleForm").css({"background-color":"#429C3E"});  // Set background colour to green-ish.
-                        $(".ArticleForm").html(data.html);                      // Clear form and replace with html from server.
+                        $(".article_form").css({"background-color":"#429C3E"});  // Set background colour to green-ish.
+                        $(".article_form").html(data.html);                      // Clear form and replace with html from server.
                         $(".flash").html("");                                   // Clear flash.
                     } else {
                         // Error, display message from server.
