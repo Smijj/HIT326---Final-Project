@@ -43,16 +43,23 @@ body.center-body {
 
 .article_list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
 
-    border: solid 2px black;
+    /* border: solid 2px black; */
     
     margin: 10px 0 10px 0;
     padding: 5px;
 
     min-width: 400px;
     width: 40%;
+    height: auto;
+
+    /* Transition Stuff */
+    transition-property: margin;
+    transition-duration: 0.2s;
+
+
 }
 .article_list_header {
     margin: 5px 0 10px 0;
@@ -62,11 +69,35 @@ body.center-body {
     font-size: 0.8rem;
 
 }
+
+.article_list_info {
+    margin: 0 0 0 15px;
+    padding: 10px;
+    width: 100%;
+    height: 140px;
+    border: solid 2px black;
+}
+.article_list_buttons {
+    text-align: center;
+    padding: 0;
+}
+.article_list_buttons div {
+    padding: 1.5em 15px 1.5em 15px;
+    height: 70px;
+
+    border: solid 2px black;
+}
+
 .article_list_keywords {
     margin: 5px 0 10px 0;
     font-weight: bold;
 }
 
+
+/* Hover Interaction Stuff for Article List */
 .article_list:hover {
+    margin: 10px 0 10px 0;
+}
+.article_list_info:hover, .article_list_buttons div:hover {
     border: dotted 2px black;
 }
