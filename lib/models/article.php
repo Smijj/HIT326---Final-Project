@@ -41,7 +41,7 @@ class Article extends Database {
 	public function registerArticle($author_id, $title, $keywords, $article_content) {
     
         if (empty($author_id) || empty($title) || empty($keywords) || empty($article_content)) {
-            throw new Exception('Empty field');
+            throw new Exception("Empty field");
         }
     
     
@@ -147,5 +147,20 @@ class Article extends Database {
         } else {
             throw new Exception('Internal error when updating article. Please try again later.');
         }
+    }
+
+    public function delete_article($id) {
+        if (empty($id)) {
+            throw new Exception("Empty field");
+        }
+        $sql = "DELETE FROM articles WHERE article_id=?";
+        if ($stmt = $this->prepare($sql)) {
+            if ($stmt->execute(array($id)) > 0) {       // Check if more than one row was deleted.
+                return true;                            // Return true on success.
+            }
+        } else {
+            throw new DBException("Failed to prepare statement.");
+        }
+        return false;                                   // Allways return false if unsuccessful.
     }
 }

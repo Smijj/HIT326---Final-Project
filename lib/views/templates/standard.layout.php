@@ -32,7 +32,7 @@
         </ul>
         <?php
           if (!empty($nav_name)) {
-            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><a href=\"editAccount\"><p style='margin:auto;'>{$nav_name}</p></a></div>";
+            echo "<div class='col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3'><a href=\"/editAccount\"><p style='margin:auto;'>{$nav_name}</p></a></div>";
           }
             // <!-- <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search"> -->
         ?>

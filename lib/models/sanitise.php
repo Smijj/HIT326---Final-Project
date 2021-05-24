@@ -6,3 +6,11 @@ function sanitise_str($str):string {
     $str = strip_tags($str);        // Removes all tags that are left behind (there should not be any).
     return $str;
 }
+
+function sanitise_int($str):int {
+    if (preg_match("^[\d]+$", $str)) {
+        return intval($str);
+    } else {
+        return 0;
+    }
+}

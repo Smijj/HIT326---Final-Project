@@ -372,6 +372,42 @@ get("/articlelist", function($app) {
     }
 });
 
+delete("/delarticle/:id;[\d]+", function($app) {
+    $user = new user();
+    $is_auth = $user->is_authenticated();
+    navbar_init($app, $user, $is_auth);
+
+    if ($is_auth === true) {
+
+        $id = $app->route_var("id");
+
+        $article = new article();
+        $article_data = $article->get_article($id);
+        // Check if user attempting to delete the article is privileged to level 2 (editor) or is the owner. 
+        if ($app->get_session_message("perm") >= 2 || $article_data->author_id == $app->get_session_message("uid")) {
+            if ($article_data != false) {
+                if ($article->delete_article($id)) {
+                    // Successful deleteion of article.
+                    $app->set_flash("Successfully removed article: '".$article_data->title."'");
+                    $app->redirect_to("/articlelist");
+                } else {
+                    $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'");
+                    $app->redirect_to("/articlelist");
+                }
+                // delete it.
+            } else {
+                $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'. The article specified was not found.");
+                $app->redirect_to("/articlelist");
+            }
+        } elseif ($app->get_session_message("perm") >= 2) {
+            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be the author or above level 2 to delete this article.");
+            $app->redirect_to("/articlelist");
+        }
+    } else {
+        $app->render(LAYOUT, "403");
+    }
+});
+
 get("/editarticle/:id;[\d]+", function($app) {
     $app->force_to_https("/editarticle/".$app->route_var("id"));
 
@@ -432,13 +468,9 @@ post("/editarticle/:id;[\d]+", function($app) {
                 $article = new Article();
                 try {
                     $article->update_article($id, $title, $keywords, $article_content, $public);
-                    // $app->set_flash("Success");
-                    // $app->redirect_to("/");
                     $app->set_message("result", 1);
                     $app->render(NULL, "editarticle.json");
                 } catch (Exception $e) {
-                    // $app->set_flash("Error: ".$e->getMessage());
-                    // $app->render(LAYOUT, "addarticle");
                     $app->set_message("result", 0);
                     $app->set_message("html", "Internal Error: ".$e->getMessage());
                     $app->render(NULL, "editarticle.json");

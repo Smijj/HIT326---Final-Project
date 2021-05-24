@@ -21,7 +21,7 @@
             if ($high_level_user == true) {
                 echo "<section class='article_list_buttons'>
                         <div data-href='/editarticle/{$article_data->article_id}'>Edit</div>
-                        <div data-href='#'>Delete</div>
+                        <div data-delete-id='{$article_data->article_id}'>Delete</div>
                     </section>
                 </article>";
             } else {

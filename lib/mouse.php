@@ -269,6 +269,9 @@ class Mouse{
             case "email":
                $value = filter_input(INPUT_POST, $key, FILTER_SANITIZE_EMAIL);
                break;
+            case "int":
+               $value = sanitise_int($_POST[$key]);
+               break;
             default:
                $value = sanitise_str($_POST[$key]);
                break;
