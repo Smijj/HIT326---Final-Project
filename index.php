@@ -411,7 +411,7 @@ post("/editarticle/:id;[\d]+", function($app) {
 
             // If the user is not privileged to set the public bool, set to null to keep the same.
             if ($app->get_session_message("perm") >= 2) {
-                $public = ($app->form("public") == "public_true") ? true : false; // 'public' is a checkbox and does not return a value if unticked.
+                $public = ($app->form("public") != "") ? 1 : 0; // 'public' is a checkbox and does not return a value if unticked.
             } else {
                 $public = null;
             }

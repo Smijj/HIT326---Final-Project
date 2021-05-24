@@ -35,12 +35,13 @@ $( function() {
         var data = $(this).serialize();                                         // Get all of the form data serialised.
         // Post the data to the sever.
         // $.post($(location).attr("pathname"), data,
-        $.post("/editarticle/18", data,
+        $.post($(location).attr("pathname"), data,
             function (data, textStatus, jqXHR) {
                 if (data != undefined && data.result != undefined && data.html != undefined) {
                     if (data.result == 1) {
                         // Successfully added to the database.
-                        $(".article_form").css({"background-color":"#429C3E"});  // Set background colour to green-ish.
+                        $( location ).attr("href", "/articlelist");             // Redirect user back to the list page.
+                        // Give the user a link back if redirect fails.
                         $(".article_form").html(data.html);                      // Clear form and replace with html from server.
                         $(".flash").html("");                                   // Clear flash.
                     } else {

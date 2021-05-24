@@ -127,12 +127,12 @@ class Article extends Database {
         return false;
     }
 
-    public function update_article($id, $title, $keywords, $article_content, $public = null) {
+    public function update_article($id, $title, $keywords, $article_content, $public = -1) {
         if (empty($title) || empty($keywords) || empty($article_content)) {
-            throw new Exception('Empty field');
+            throw new Exception("Empty field");
         }
-    
-        if ($public != null) {
+        // Setup different sql statements and variables depending on the state of public.
+        if ($public != -1) {
             $sql = "UPDATE articles SET title=?, keywords=?, content=?, public=? WHERE article_id=?";
             $variables = array($title, $keywords, $article_content, $public, $id);
         } else {
