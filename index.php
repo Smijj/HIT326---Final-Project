@@ -504,6 +504,9 @@ get("/editAccount", function($app) {
     if ($is_auth == true) {
         $data = $user->get_user();
         foreach ($data as $key => $value) {
+            if ($key == "perm") {
+                $key = "perm_form";
+            }
             $app->set_message($key, $value);
         }
         $app->set_message("lockperm", true);
