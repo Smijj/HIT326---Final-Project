@@ -34,6 +34,17 @@ body.center-body {
     align-items: center;
 }
 
+#user_name {
+    margin:auto;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px;
+    border-radius: .25rem;
+}
+#user_name:hover {
+    background-color: #31363a;
+}
+
 /* ADD ARTICLE STYLES */
 .article_form {
     padding: 10px;
