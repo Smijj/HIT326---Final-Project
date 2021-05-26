@@ -213,7 +213,7 @@ get("/signout", function($app) {
 
 //Article creation get request
 get("/addarticle", function($app) {
-    $app->force_to_https("/signin");
+    $app->force_to_https("/addarticle");
     $user = new user();
     $is_auth = false;
     $author_id = $user->get_user_id();
@@ -312,7 +312,7 @@ put("/addarticle", function($app) {
 
 // Display article list page
 get("/articlelist", function($app) {
-    $app->force_to_https("/signin");
+    $app->force_to_https("/articlelist");
     
     $article = new Article();
     $user = new User();
@@ -479,7 +479,6 @@ post("/editarticle/:id;[\d]+", function($app) {
 // Display article contense.
 get("/article/:id;[\d]+", function($app) {
     $id = $app->route_var('id');
-    $app->force_to_https("/article/".$id);
     
     // Get required data.
     $article = new Article();
@@ -522,6 +521,7 @@ get("/article/:id;[\d]+", function($app) {
 
 
 get("/editAccount", function($app) {
+    $app->force_to_https("/editAccount");
     $user = new User();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
