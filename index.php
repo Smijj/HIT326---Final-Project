@@ -520,7 +520,7 @@ get("/article/:id;[\d]+", function($app) {
 });
 
 
-get("/editAccount", function($app) {
+get("/editaccount", function($app) {
     $app->force_to_https("/editAccount");
     $user = new User();
     $is_auth = $user->is_authenticated();
@@ -539,7 +539,7 @@ get("/editAccount", function($app) {
     }
 });
 
-post("/editAccount", function($app) {
+post("/editaccount", function($app) {
     $user = new User();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
