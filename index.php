@@ -384,8 +384,8 @@ delete("/delarticle/:id;[\d]+", function($app) {
         // Get article data.
         $article = new article();
         $article_data = $article->get_article($id);
-        // Check if user attempting to delete the article is privileged to level 2 (editor) or above. 
-        if ($app->get_session_message("perm") >= 2) {
+        // Check if user attempting to delete the article is privileged to level 2 (editor) or above.
+        if ($app->get_session_message("perm") >= 2 || $app->get_session_message("uid") == $article_data->author_id) {
             // Then check if the article id is valid.
             if ($article_data != false) {
                 // Attempt to delete the article.
@@ -401,9 +401,11 @@ delete("/delarticle/:id;[\d]+", function($app) {
                 $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'. The article specified was not found.");
                 $app->redirect_to("/articlelist");
             }
-        } elseif ($app->get_session_message("perm") >= 2) {
-            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be above level 2 to delete this article.");
+        } elseif ($app->get_session_message("perm") < 2) {
+            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be above level 2 or the author to delete this article.");
             $app->redirect_to("/articlelist");
+        } else {
+
         }
     } else {
         header("HTTP/1.0 403 Access Denied.");
