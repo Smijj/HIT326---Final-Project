@@ -276,7 +276,7 @@ put("/addarticle", function($app) {
                 $public = 0;
             }
 
-            if ($title == "" || $keywords == "" || $article_content == "") {
+            if ($title == "" || $article_content == "") {
                 // An input was left blank.
                 $app->set_message("result", 0);
                 $app->set_message("html", "Please fill all fields.");
@@ -474,7 +474,7 @@ post("/editarticle/:id;[\d]+", function($app) {
                 $app->render(NULL, "editarticle.json");
                 exit();
             }
-            if ($title == "" || $keywords == "" || $article_content == "") {
+            if ($title == "" || $article_content == "") {
                 $app->set_message("result", 0);
                 $app->set_message("html", "Please fill all fields.");
                 $app->render(NULL, "editarticle.json");
