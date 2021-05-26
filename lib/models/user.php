@@ -137,8 +137,8 @@ class User extends Database {
     
         if (empty($email) || empty($fname) || empty($lname) || empty($pwd) || empty($perm)) {
             throw new Exception('Empty field');
-        } else if (strlen($pwd) <= 8) {
-            throw new Exception('Password should be larger than 8 characters.');
+        } else if (!$this->test_pwd($pwd)) {
+            throw new Exception('Password should be a minimum of 8 characters with at least one lowercase, uppercase, and special character.');
         }
     
         // Set-up and execute a prepared sql statement to get all users with matching emails.
@@ -165,7 +165,16 @@ class User extends Database {
             }
         }
     }
-
+    
+    /**
+     * updateUser
+     *
+     * @param  string $email
+     * @param  string $fname
+     * @param  string $lname
+     * @param  string $pwd
+     * @return void
+     */
     public function updateUser($email, $fname, $lname, $pwd) {
         if (empty($email) || empty($fname) || empty($lname)) {
             throw new Exception('Empty field');
@@ -182,8 +191,8 @@ class User extends Database {
             throw new Exception('Username currently in use.');
         } else {
             if ($pwd != "") {
-                if (strlen($pwd) <= 8) {
-                    throw new Exception('Password should be larger than 8 characters.');
+                if (!$this->test_pwd($pwd)) {
+                    throw new Exception('Password should be a minimum of 8 characters with at least one lowercase, uppercase, and special character.');
                 }
                 // Hash password.
                 // $pwd_peppered = $this->generate_pepper_hash($pwd);
@@ -313,7 +322,21 @@ class User extends Database {
     }
     
     /**
-     * set an authenticated session and session information.
+     * Tests password, returning true if the inputted string constains a minimum of 8 characters with at least one lowercase, uppercase, and special character.
+     *
+     * @param  string $pwd
+     * @return bool
+     */
+    private function test_pwd($pwd) {
+        if (preg_match('/^(?=(?:.*[A-Z]){1,})(?=(?:.*[a-z]){1,})(?=(?:.*[0-9]{1,}))(?=(?:.*[!@#$%^&*()\-__+.]{1,})).{8,}$/', $pwd)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    /**
+     * Set an authenticated session and session information.
      *
      * @param  string $uid Unique user identifier
      * @param  string $name Full name
@@ -332,7 +355,7 @@ class User extends Database {
     }
 
     /**
-     * Unsets all session variables then attempts to destory the session.
+     * Un-sets all session variables then attempts to destory the session.
      * Returns boolean depicting success of destory, and will always unset.
      * @return bool
      */
