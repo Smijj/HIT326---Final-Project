@@ -371,6 +371,7 @@ get("/articlelist", function($app) {
         exit();
     }
 });
+
 // Deletes an article from the database if the user is permitted to do so.
 delete("/delarticle/:id;[\d]+", function($app) {
     // Check user authentication.

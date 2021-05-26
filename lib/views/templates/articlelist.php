@@ -16,9 +16,9 @@
                         <h2 class='article_list_header'>{$article_data->title}</h2>
                         <p class='article_list_subheader'>Written by {$article_data->name}</p>
                         <p class='article_list_subheader'>Last Edited on {$article_data->date_last_edit}</p>
-                        <p class='article_list_keywords'>Keywords: {$article_data->keywords}</p>".
-                        (($high_level_user == true || $user_id == $article_data->author_id) ? "<p class='article_list_public'>".(($article_data->public == true)? "Public": "Hidden")."</p>" : "").
-                    "</section>";
+                        ".(($high_level_user == true || $user_id == $article_data->author_id) ? "<p class='article_list_subheader'>Visibility: ".(($article_data->public == true)? "Public": "Hidden")."</p>" : "")."
+                        <p class='article_list_keywords'>Keywords: {$article_data->keywords}</p>
+                    </section>";
                 if ($high_level_user == true || $user_id == $article_data->author_id) {
                     echo "<section class='article_list_buttons'>
                             <div data-href='/editarticle/{$article_data->article_id}'>Edit</div>
