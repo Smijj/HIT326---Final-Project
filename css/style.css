@@ -104,7 +104,7 @@ body.center-body {
     height: inherit;
 }
 .article_list_buttons div {
-    padding: 6px;
+    padding: 8px;
     
     writing-mode: vertical-rl;
     text-orientation: sideways;
@@ -117,6 +117,7 @@ body.center-body {
 /* Hover Interaction Stuff for Article List */
 .article_list:hover {
     margin: 10px 0 10px 0;
+    cursor: pointer;
 }
 .article_list_info:hover, .article_list_buttons div:hover {
     border: dotted 2px black;
