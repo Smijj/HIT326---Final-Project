@@ -174,7 +174,6 @@ put("/signup", function($app) {
                     try {
                         if ($db_empty) { $perm = 3; }                        // Set permission level to 3 regardless of what user submitted (only for first user).
                         $user->registerUser($email, $fname, $lname, $pwd, $perm);
-                        $user->signout();
                         $app->set_flash("Success");
                         $app->redirect_to("/");
                     } catch (Exception $e) {
