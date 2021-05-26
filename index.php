@@ -379,7 +379,7 @@ delete("/delarticle", function($app) {
     navbar_init($app, $user, $is_auth);
 
     if ($is_auth === true) {
-        $id = $app->form("id");
+        $id = $app->form("id", "int");
 
         // Get article data.
         $article = new article();
