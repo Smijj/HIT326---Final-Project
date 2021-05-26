@@ -33,6 +33,8 @@ require MODELS."article.php";
 /********************** Controller logic below here ********************************/
 
 get("/", function($app) {
+    $app->set_message("title", "Home");                    // Set page title
+
     $user = new user();                                     // Create new user class.
     $is_auth = false;
     if ($user->is_db_empty()) {
@@ -57,12 +59,16 @@ get("/", function($app) {
 });
 
 get("/signin", function($app) {
+    $app->set_message("title", "Signin");                   // Set page title
+
     $app->force_to_https("/signin");
     $app->set_csrftoken();
     $app->render("blank", "signin");                        // Always render the sign-in page in a black HTML document.
 });
 
 post("/signin", function($app) {
+    $app->set_message("title", "Signin");                   // Set page title
+
     $email = $app->form("email", "email");                  // Get clean email and password from user.
     $pwd = $app->form("pwd");
     $app->set_message("email", ($email) ? $email : "");     // Pass email (if entered) back to sign-in page to display on error.
@@ -84,7 +90,9 @@ post("/signin", function($app) {
 });
 
 get("/signup", function($app) {
-    $app->force_to_https("/signup");                     // Force user to use https for sensitive messages.
+    $app->set_message("title", "Signup");                   // Set page title
+    
+    $app->force_to_https("/signup");                        // Force user to use https for sensitive messages.
 
     try {
         $user = new User();                                 // Create new user class.
@@ -122,6 +130,8 @@ get("/signup", function($app) {
 });
 
 put("/signup", function($app) {
+    $app->set_message("title", "Signup");                    // Set page title
+
     $email = $app->form("email", "email");
     $pwd = $app->form("pwd");
     $pwd_conf = $app->form("pwdConf");
@@ -213,6 +223,8 @@ get("/signout", function($app) {
 
 //Article creation get request
 get("/addarticle", function($app) {
+    $app->set_message("title", "Add Article");                    // Set page title
+
     $app->force_to_https("/addarticle");
     $user = new user();
     $is_auth = false;
@@ -243,6 +255,8 @@ get("/addarticle", function($app) {
 
 //Article creation post/put function: AJAX
 put("/addarticle", function($app) {
+    $app->set_message("title", "Add Article");                    // Set page title
+
     // Get User class to access user info.
     $user = new User();
     
@@ -312,6 +326,8 @@ put("/addarticle", function($app) {
 
 // Display article list page
 get("/articlelist", function($app) {
+    $app->set_message("title", "Article List");                    // Set page title
+
     $app->force_to_https("/articlelist");
     
     $article = new Article();
@@ -345,8 +361,11 @@ get("/articlelist", function($app) {
     }
 });
 
+
 // Deletes an article from the database if the user is permitted to do so.
 delete("/delarticle", function($app) {
+    $app->set_message("title", "Delete Article");                    // Set page title
+
     // Check user authentication.
     $user = new user();
     $is_auth = $user->is_authenticated();
@@ -386,8 +405,12 @@ delete("/delarticle", function($app) {
         $app->render(LAYOUT, "403");
     }
 });
+
+
 // Displays Article data in form for editing.
 get("/editarticle/:id;[\d]+", function($app) {
+    $app->set_message("title", "Edit Article");                    // Set page title
+
     $app->force_to_https("/editarticle/".$app->route_var("id"));
     // Check user authentication.
     $user = new User();
@@ -422,6 +445,8 @@ get("/editarticle/:id;[\d]+", function($app) {
 
 // EditArticle post function: AJAX
 post("/editarticle/:id;[\d]+", function($app) {
+    // $app->set_message("title", "Edit Article");                    // Set page title
+
     // Check user authentication.
     $user = new User();
     $id = $app->route_var("id");
@@ -476,7 +501,9 @@ post("/editarticle/:id;[\d]+", function($app) {
         $app->redirect_to("/");
     }
 });
-// Display article contense.
+
+
+// Display article content.
 get("/article/:id;[\d]+", function($app) {
     $id = $app->route_var('id');
     
@@ -494,6 +521,10 @@ get("/article/:id;[\d]+", function($app) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
     }
+
+    $app->set_message("title", $article_data->title);                    // Set page title
+
+
     // check if requested article is valid.
     if ($article_data !== false) {
         // If the article is public then show it
@@ -521,6 +552,8 @@ get("/article/:id;[\d]+", function($app) {
 
 
 get("/editAccount", function($app) {
+    $app->set_message("title", "Edit Account");                    // Set page title
+
     $app->force_to_https("/editAccount");
     $user = new User();
     $is_auth = $user->is_authenticated();
@@ -540,6 +573,8 @@ get("/editAccount", function($app) {
 });
 
 post("/editAccount", function($app) {
+    $app->set_message("title", "Edit Account");                    // Set page title
+
     $user = new User();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
