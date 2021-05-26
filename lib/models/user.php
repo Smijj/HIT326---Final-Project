@@ -54,14 +54,15 @@ class User extends Database {
         if(!empty($id) && !empty($hash)) {
 
             try{
-               $query = "SELECT pwd FROM users WHERE user_id=?";
+               $query = "SELECT pwd, perm FROM users WHERE user_id=?";
                if($statement = $this->prepare($query)){
                     $binding = array($id);
                     if(!$statement -> execute($binding)){
                     return false;
                     } else {
                         $result = $statement->fetch(PDO::FETCH_ASSOC);
-                        if($result !== false && $result['pwd'] === $hash){
+                        if($result !== false && $result['pwd'] === $hash && $result['perm'] >= 1){
+                            $_SESSION['perm'] = $result['perm'];
                             return true;
                         }
                     }

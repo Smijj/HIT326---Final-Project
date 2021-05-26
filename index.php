@@ -174,7 +174,6 @@ put("/signup", function($app) {
                     try {
                         if ($db_empty) { $perm = 3; }                        // Set permission level to 3 regardless of what user submitted (only for first user).
                         $user->registerUser($email, $fname, $lname, $pwd, $perm);
-                        $user->signout();
                         $app->set_flash("Success");
                         $app->redirect_to("/");
                     } catch (Exception $e) {
@@ -276,7 +275,7 @@ put("/addarticle", function($app) {
                 $public = 0;
             }
 
-            if ($title == "" || $keywords == "" || $article_content == "") {
+            if ($title == "" || $article_content == "") {
                 // An input was left blank.
                 $app->set_message("result", 0);
                 $app->set_message("html", "Please fill all fields.");
@@ -373,20 +372,20 @@ get("/articlelist", function($app) {
 });
 
 // Deletes an article from the database if the user is permitted to do so.
-delete("/delarticle/:id;[\d]+", function($app) {
+delete("/delarticle", function($app) {
     // Check user authentication.
     $user = new user();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
 
     if ($is_auth === true) {
-        $id = $app->route_var("id");
+        $id = $app->form("id");
 
         // Get article data.
         $article = new article();
         $article_data = $article->get_article($id);
-        // Check if user attempting to delete the article is privileged to level 2 (editor) or above. 
-        if ($app->get_session_message("perm") >= 2) {
+        // Check if user attempting to delete the article is privileged to level 2 (editor) or above.
+        if ($app->get_session_message("perm") >= 2 || $app->get_session_message("uid") == $article_data->author_id) {
             // Then check if the article id is valid.
             if ($article_data != false) {
                 // Attempt to delete the article.
@@ -402,9 +401,11 @@ delete("/delarticle/:id;[\d]+", function($app) {
                 $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'. The article specified was not found.");
                 $app->redirect_to("/articlelist");
             }
-        } elseif ($app->get_session_message("perm") >= 2) {
-            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be above level 2 to delete this article.");
+        } elseif ($app->get_session_message("perm") < 2) {
+            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be above level 2 or the author to delete this article.");
             $app->redirect_to("/articlelist");
+        } else {
+
         }
     } else {
         header("HTTP/1.0 403 Access Denied.");
@@ -473,7 +474,7 @@ post("/editarticle/:id;[\d]+", function($app) {
                 $app->render(NULL, "editarticle.json");
                 exit();
             }
-            if ($title == "" || $keywords == "" || $article_content == "") {
+            if ($title == "" || $article_content == "") {
                 $app->set_message("result", 0);
                 $app->set_message("html", "Please fill all fields.");
                 $app->render(NULL, "editarticle.json");

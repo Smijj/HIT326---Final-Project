@@ -23,7 +23,7 @@ class articleData {
      * @param  string $name
      * @return void
      */
-    public function __construct($article_id = null, $author_id = null, $title = null, $article_content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
+    public function __construct($article_id = "", $author_id = "", $title = "", $article_content = "", $keywords = "", $date_last_edit = "", $public = "", $name = "") {
         $this->article_id = $article_id;
         $this->author_id = $author_id;
         $this->title = $title;
@@ -77,7 +77,7 @@ class Article extends Database {
                     if ($to_html == true) {
                         $article_content = nl2br($article_content);     // Replaces new line codes with html ones.
                     }
-                    return new articleData($result['article_id'], $result['author_id'], $result['title'], $article_content, $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
+                    return new articleData($result['article_id'], $result['author_id'], $result['title'], $article_content, ($result['keywords'] == NULL)? "" : $result['keywords'], $result['update_date'], ($result['public'] == 1)? true:false, $result['fname']." ".$result['lname']);
                 } else {
                     return false;
                 }
@@ -86,12 +86,6 @@ class Article extends Database {
         return false;
     }
 
-
-
-    /**
-     *
-     * @return output Returns boolean **False** on fail/not found.
-     */
     
     /**
      * Return **articleData[]** class with data of all articles in the article table or empty if nothing found.
@@ -114,9 +108,9 @@ class Article extends Database {
                     if ($list_length != 0 && $article_count > $list_length) {
                         break;                                                  // Break foreach loop if requested article amount is reached.
                     }
-                    if (($only_public == true && $value['public'] == true) || $only_public != true) { // Only add article if only_visible is true and it is visible, or only_visible is false. 
+                    if (($only_public == true && $value['public'] == true) || $only_public != true) { // Only add article if only_visible is true and it is visible, or only_visible is false.
                         if ($list_length != 0) { $article_count++; }            // If limit on article amount increment counter.
-                        $output[$key] = new articleData($value['article_id'], $value['author_id'], $value['title'], $value['content'], $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
+                        $output[$key] = new articleData($value['article_id'], $value['author_id'], $value['title'], $value['content'], ($value['keywords'] == NULL)? "" : $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
                     }
                 }
                 return $output;
