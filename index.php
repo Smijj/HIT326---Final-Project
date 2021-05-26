@@ -379,7 +379,7 @@ delete("/delarticle", function($app) {
     navbar_init($app, $user, $is_auth);
 
     if ($is_auth === true) {
-        $id = $app->form("id", "int");
+        $id = $app->form("id");
 
         // Get article data.
         $article = new article();
@@ -398,7 +398,7 @@ delete("/delarticle", function($app) {
                     $app->redirect_to("/articlelist");
                 }
             } else {
-                $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'. The article specified was not found.");
+                $app->set_flash("An error occurred while attempting to remove article: \"".$article_data->title."\". The article specified was not found.");
                 $app->redirect_to("/articlelist");
             }
         } elseif ($app->get_session_message("perm") < 2) {

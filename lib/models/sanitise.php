@@ -16,7 +16,7 @@ function sanitise_str($str):string {
 /**
  * Sanitises int variables. Returns **int 0** if string passed is not an int.
  *
- * @param  mixed $str
+ * @param  string $str 
  * @return int
  */
 function sanitise_int($str):int {
