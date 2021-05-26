@@ -310,33 +310,7 @@ put("/addarticle", function($app) {
     }
 });
 
-//Display Edit Articles List
-// get("/editarticleslist", function($app) {
-//     $app->force_to_https("/signin");
-//     $user = new user();
-//     $is_auth = false;
-
-//     try {
-//         $is_auth = $user->is_authenticated();
-//         $app->set_message("is_auth", $is_auth);
-//         if ($is_auth) {
-//             //$username = $app->get_session_message("name");
-//             //$app->set_message("username", $username);
-// 			navbar_init($app, $user, $is_auth);
-//             $app->render(LAYOUT, "editarticleslist");
-//         } else {
-//             $app->set_flash("You are not authorised");
-//             $app->redirect_to("/");
-//             exit();
-//         }
-//     } catch (Exception $e) {
-//         $app->set_flash("Database error");
-//         $app->redirect_to("/");
-//         exit();
-//     }
-// });
-
-
+// Display article list page
 get("/articlelist", function($app) {
     $app->force_to_https("/signin");
     
