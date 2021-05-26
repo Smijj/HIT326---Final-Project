@@ -372,14 +372,14 @@ get("/articlelist", function($app) {
     }
 });
 // Deletes an article from the database if the user is permitted to do so.
-delete("/delarticle/:id;[\d]+", function($app) {
+delete("/delarticle", function($app) {
     // Check user authentication.
     $user = new user();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
 
     if ($is_auth === true) {
-        $id = $app->route_var("id");
+        $id = $app->form("id");
 
         // Get article data.
         $article = new article();
