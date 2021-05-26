@@ -177,7 +177,7 @@ put("/signup", function($app) {
                         $app->set_flash("Success");
                         $app->redirect_to("/");
                     } catch (Exception $e) {
-                        $app->set_flash("Error: ".$e->getMessage());
+                        $app->set_flash($e->getMessage());
                         $app->render(LAYOUT, "signup");
                     }
                     exit();
