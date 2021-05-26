@@ -84,9 +84,16 @@ body.center-body {
     flex-direction: column;
     align-items: center;
     padding: 10px;
-    width: 50%;
+    min-width: 700px;
+    width: 55%
 }
 #add_article_form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#edit_article_form {
     width: 100%;
     display: flex;
     flex-direction: column;
