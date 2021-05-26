@@ -312,30 +312,30 @@ put("/addarticle", function($app) {
 });
 
 //Display Edit Articles List
-get("/editarticleslist", function($app) {
-    $app->force_to_https("/signin");
-    $user = new user();
-    $is_auth = false;
+// get("/editarticleslist", function($app) {
+//     $app->force_to_https("/signin");
+//     $user = new user();
+//     $is_auth = false;
 
-    try {
-        $is_auth = $user->is_authenticated();
-        $app->set_message("is_auth", $is_auth);
-        if ($is_auth) {
-            //$username = $app->get_session_message("name");
-            //$app->set_message("username", $username);
-			navbar_init($app, $user, $is_auth);
-            $app->render(LAYOUT, "editarticleslist");
-        } else {
-            $app->set_flash("You are not authorised");
-            $app->redirect_to("/");
-            exit();
-        }
-    } catch (Exception $e) {
-        $app->set_flash("Database error");
-        $app->redirect_to("/");
-        exit();
-    }
-});
+//     try {
+//         $is_auth = $user->is_authenticated();
+//         $app->set_message("is_auth", $is_auth);
+//         if ($is_auth) {
+//             //$username = $app->get_session_message("name");
+//             //$app->set_message("username", $username);
+// 			navbar_init($app, $user, $is_auth);
+//             $app->render(LAYOUT, "editarticleslist");
+//         } else {
+//             $app->set_flash("You are not authorised");
+//             $app->redirect_to("/");
+//             exit();
+//         }
+//     } catch (Exception $e) {
+//         $app->set_flash("Database error");
+//         $app->redirect_to("/");
+//         exit();
+//     }
+// });
 
 
 get("/articlelist", function($app) {
@@ -361,6 +361,7 @@ get("/articlelist", function($app) {
     }
 
     if ($article_data !== false) {
+        $app->set_message("user_id", $user->get_user_id());
         $app->set_message("article_list", $article_data);
         $app->set_message("high_level_user", $high_level_user);
         $app->render(LAYOUT, "articlelist");
@@ -370,21 +371,24 @@ get("/articlelist", function($app) {
         exit();
     }
 });
-
+// Deletes an article from the database if the user is permitted to do so.
 delete("/delarticle/:id;[\d]+", function($app) {
+    // Check user authentication.
     $user = new user();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
 
     if ($is_auth === true) {
-
         $id = $app->route_var("id");
 
+        // Get article data.
         $article = new article();
         $article_data = $article->get_article($id);
-        // Check if user attempting to delete the article is privileged to level 2 (editor) or is the owner. 
+        // Check if user attempting to delete the article is privileged to level 2 (editor) or above. 
         if ($app->get_session_message("perm") >= 2) {
+            // Then check if the article id is valid.
             if ($article_data != false) {
+                // Attempt to delete the article.
                 if ($article->delete_article($id)) {
                     // Successful deleteion of article.
                     $app->set_flash("Successfully removed article: '".$article_data->title."'");
@@ -393,7 +397,6 @@ delete("/delarticle/:id;[\d]+", function($app) {
                     $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'");
                     $app->redirect_to("/articlelist");
                 }
-                // delete it.
             } else {
                 $app->set_flash("An error occurred while attempting to remove article: '".$article_data->title."'. The article specified was not found.");
                 $app->redirect_to("/articlelist");
@@ -407,35 +410,43 @@ delete("/delarticle/:id;[\d]+", function($app) {
         $app->render(LAYOUT, "403");
     }
 });
-
+// Displays Article data in form for editing.
 get("/editarticle/:id;[\d]+", function($app) {
     $app->force_to_https("/editarticle/".$app->route_var("id"));
-
+    // Check user authentication.
     $user = new User();
-    $is_auth = $user->is_authenticated();
-    navbar_init($app, $user, $is_auth);
-    if ($is_auth == true) {
-        $article = new Article();
-        $article_data = $article->get_article($app->route_var("id"));
-
-        if ($article_data != false && !empty($article_data)) {
-            foreach ($article_data as $key => $value) {
-                $app->set_message($key, $value);
+    try {
+        $is_auth = $user->is_authenticated();
+        navbar_init($app, $user, $is_auth);
+        if ($is_auth == true) {
+            // Try to get article data.
+            $article = new Article();
+            $article_data = $article->get_article($app->route_var("id"));
+            // Check if article is valid.
+            if ($article_data != false && !empty($article_data)) {
+                // Pass every variable separately as utilising the articleForm.php partial.
+                foreach ($article_data as $key => $value) {
+                    $app->set_message($key, $value);
+                }
+                $app->set_csrftoken();
+                $app->render(LAYOUT, "editarticle");
+            } else {
+                header("HTTP/1.0 404 Not Found");
+                $app->render(LAYOUT, "404");
             }
-            $app->set_csrftoken();
-            $app->render(LAYOUT, "editarticle");
         } else {
-            header("HTTP/1.0 404 Not Found");
-            $app->render(LAYOUT, "404");
+            header("HTTP/1.0 403 Access Denied.");
+            $app->render(LAYOUT, "403");
         }
-    } else {
-        header("HTTP/1.0 403 Access Denied.");
-        $app->render(LAYOUT, "403");
+    } catch (Exception $e) {
+        $app->set_flash("ERROR: {$e->getMessage()}");
+        $app->redirect_to("/");
     }
 });
 
 // EditArticle post function: AJAX
 post("/editarticle/:id;[\d]+", function($app) {
+    // Check user authentication.
     $user = new User();
     $id = $app->route_var("id");
     try {
@@ -447,11 +458,11 @@ post("/editarticle/:id;[\d]+", function($app) {
             $article_content = $app->form("article_content");
             $csrf_token = $app->form("token");
 
-            // If the user is not privileged to set the public bool, set to null to keep the same.
+            // If the user is not privileged to set the public bool, set to -1 to keep the same.
             if ($app->get_session_message("perm") >= 2) {
                 $public = ($app->form("public") != "") ? 1 : 0; // 'public' is a checkbox and does not return a value if unticked.
             } else {
-                $public = null;
+                $public = -1;
             }
 
             if (!$app->check_csrftoken($csrf_token)) {
@@ -467,6 +478,7 @@ post("/editarticle/:id;[\d]+", function($app) {
                 $app->render(NULL, "editarticle.json");
                 exit();
             } else {
+                // Attempt to update the article.
                 $article = new Article();
                 try {
                     $article->update_article($id, $title, $keywords, $article_content, $public);
@@ -485,26 +497,29 @@ post("/editarticle/:id;[\d]+", function($app) {
         }
     } catch (Exception $e) {
         $app->set_flash("An internal error has occurred: ".$e->getMessage());
+        $app->redirect_to("/");
     }
 });
-
+// Display article contense.
 get("/article/:id;[\d]+", function($app) {
-    $app->force_to_https("/signin");
+    $id = $app->route_var('id');
+    $app->force_to_https("/article/".$id);
     
+    // Get required data.
     $article = new Article();
     $user = new User();
-    $is_auth = $user->is_authenticated();
-    
-    navbar_init($app);
     try {
-        $article_data = $article->get_article($app->route_var('id'), true);
+        $is_auth = $user->is_authenticated();
+        
+        navbar_init($app);
+        $article_data = $article->get_article($id, true);
         $user_data = $user->get_user();
         $user_id = $user->get_user_id();
     } catch (DBException $e) {
         $app->set_flash("Internal DB error: ".$e->getMessage());
         $app->redirect_to("/");
     }
-
+    // check if requested article is valid.
     if ($article_data !== false) {
         // If the article is public then show it
         if ($article_data->public === true) {
@@ -519,8 +534,7 @@ get("/article/:id;[\d]+", function($app) {
                 $app->set_message("articles_data", $article_data);
                 $app->render(LAYOUT, "article");
             } else {
-                $app->set_flash("You are not authorised");
-                $app->redirect_to("/");
+                $app->render(LAYOUT, "404");
                 exit();
             }
         }
