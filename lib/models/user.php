@@ -13,7 +13,11 @@ class DBException extends Exception{
 
 /**** === Custom Classes === ****/
 class userdata {
-    public string $uid, $fname, $lname, $email, $perm;
+    public string $uid;
+    public string $fname;
+    public string $lname;
+    public string $email;
+    public string $perm;
 
     public function __construct($uid = "", $fname = "", $lname = "", $email = "", $perm = "") {
         $this->uid = $uid;
