@@ -105,10 +105,10 @@ class Article extends Database {
             if (!empty($result)) {
                 $article_count = 0;
                 foreach ($result as $key => $value) {
-                    if ($list_length != 0 && $article_count > $list_length) {
+                    if ($list_length != 0 && $article_count > $list_length+1) {
                         break;                                                  // Break foreach loop if requested article amount is reached.
                     }
-                    if (($only_public == true && $value['public'] == true) || $only_public != true) { // Only add article if only_visible is true and it is visible, or only_visible is false.
+                    if (($only_public == true && $value['public'] == 1) || $only_public != true) { // Only add article if only_visible is true and it is visible, or only_visible is false.
                         if ($list_length != 0) { $article_count++; }            // If limit on article amount increment counter.
                         $output[$key] = new articleData($value['article_id'], $value['author_id'], $value['title'], $value['content'], ($value['keywords'] == NULL)? "" : $value['keywords'], $value['update_date'], ($value['public'] == 1)? true:false, $value['fname']." ".$value['lname']);;
                     }
