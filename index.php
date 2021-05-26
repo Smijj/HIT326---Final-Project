@@ -551,13 +551,9 @@ get("/article/:id;[\d]+", function($app) {
 });
 
 
-<<<<<<< HEAD
 get("/editAccount", function($app) {
     $app->set_message("title", "Edit Account");                    // Set page title
 
-=======
-get("/editaccount", function($app) {
->>>>>>> 2af0f5131b41e8d4be9d2c6b004041f44b74b581
     $app->force_to_https("/editAccount");
     $user = new User();
     $is_auth = $user->is_authenticated();
@@ -576,13 +572,9 @@ get("/editaccount", function($app) {
     }
 });
 
-<<<<<<< HEAD
 post("/editAccount", function($app) {
     $app->set_message("title", "Edit Account");                    // Set page title
 
-=======
-post("/editaccount", function($app) {
->>>>>>> 2af0f5131b41e8d4be9d2c6b004041f44b74b581
     $user = new User();
     $is_auth = $user->is_authenticated();
     navbar_init($app, $user, $is_auth);
