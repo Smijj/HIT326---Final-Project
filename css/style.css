@@ -80,7 +80,11 @@ body.center-body {
     font-size: 0.8rem;
 
 }
-
+.article_list_public {
+    margin: 5px 0 10px 0;
+    font-weight: bold;
+    text-align: right;
+}
 .article_list_info {
     margin: 0 0 0 15px;
     padding: 10px;

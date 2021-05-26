@@ -230,8 +230,8 @@ get("/addarticle", function($app) {
             $app->set_csrftoken();
             $app->render(LAYOUT, "addarticle");
         } else {
-            $app->set_flash("You are not authorised");
-            $app->redirect_to("/");
+            header("HTTP/1.0 403 Access Denied.");
+            $app->render(LAYOUT, "403");
             exit();
         }
     } catch (Exception $e) {
@@ -242,33 +242,25 @@ get("/addarticle", function($app) {
 });
 
 
-//Article creation post function: AJAX
+//Article creation post/put function: AJAX
 put("/addarticle", function($app) {
-    
+    // Get User class to access user info.
     $user = new User();
-    $author_id = $user->get_user_id();
-    $app->set_message("author_id", $author_id);
-
+    
     try {
+        // Check authorisation.
         $is_auth = $user->is_authenticated();
-
+        // Access to this feature requires permissions.
         if ($is_auth == true) {
-            // $app->set_message("is_auth", $is_auth);
-            // $username = $app->get_session_message("name");
-            // $app->set_message("username", $username);
-
-            /* Commented out for AJAX testing */
-            // navbar_init($app, $user, $is_auth);
+            // Get variables from input form and database/session.
+            $author_id = $user->get_user_id();
+            $app->set_message("author_id", $author_id);
             $title = $app->form("title");
             $keywords = $app->form("keywords");
             $article_content = $app->form("article_content");
             $csrf_token = $app->form("token");
 
-            /* Commented out for AJAX testing */
-            // $app->set_message("title", ($title != false) ? $title : "");
-            // $app->set_message("keywords", ($keywords != false) ? $keywords : "");
-            // $app->set_message("article_content", ($article_content != false) ? $article_content : "");
-
+            // Check CSRF tocken.
             if (!$app->check_csrftoken($csrf_token)) {
                 // CSRF token failure.
                 $app->set_message("result", 0);
@@ -277,9 +269,15 @@ put("/addarticle", function($app) {
                 exit();
             }
 
+            // If the user is not privileged to set the public bool, set to 0 to default to hidden.
+            if ($app->get_session_message("perm") >= 2) {
+                $public = ($app->form("public") != "") ? 1 : 0; // 'public' is a checkbox and does not return a value if unticked.
+            } else {
+                $public = 0;
+            }
+
             if ($title == "" || $keywords == "" || $article_content == "") {
-                // $app->set_flash("Please fill all fields.");
-                // $app->render(LAYOUT, "addarticle");
+                // An input was left blank.
                 $app->set_message("result", 0);
                 $app->set_message("html", "Please fill all fields.");
                 $app->render(NULL, "addarticle.json");
@@ -287,14 +285,13 @@ put("/addarticle", function($app) {
             } else {
                 $article = new Article();
                 try {
-                    $article->registerArticle($author_id, $title, $keywords, $article_content);
-                    // $app->set_flash("Success");
-                    // $app->redirect_to("/");
+                    // Attempt to register the new article, then send success to user.
+                    $article->registerArticle($author_id, $title, $keywords, $article_content, $public);
+
                     $app->set_message("result", 1);
                     $app->render(NULL, "addarticle.json");
                 } catch (Exception $e) {
-                    // $app->set_flash("Error: ".$e->getMessage());
-                    // $app->render(LAYOUT, "addarticle");
+                    // Something happend, send error to user.
                     $app->set_message("result", 0);
                     $app->set_message("html", "Internal Error: ".$e->getMessage());
                     $app->render(NULL, "addarticle.json");
@@ -302,8 +299,10 @@ put("/addarticle", function($app) {
                 exit();
             } 
         } else {
-            $app->set_flash("You are not authorised");
-            $app->redirect_to("/");
+            // Render 403 if user does not have access,
+            // this would be consistant with how the server should react for any type of request.
+            header("HTTP/1.0 403 Access Denied.");
+            $app->render(LAYOUT, "403");
             exit();
         }
     } catch (Exception $e) {
@@ -384,7 +383,7 @@ delete("/delarticle/:id;[\d]+", function($app) {
         $article = new article();
         $article_data = $article->get_article($id);
         // Check if user attempting to delete the article is privileged to level 2 (editor) or is the owner. 
-        if ($app->get_session_message("perm") >= 2 || $article_data->author_id == $app->get_session_message("uid")) {
+        if ($app->get_session_message("perm") >= 2) {
             if ($article_data != false) {
                 if ($article->delete_article($id)) {
                     // Successful deleteion of article.
@@ -400,10 +399,11 @@ delete("/delarticle/:id;[\d]+", function($app) {
                 $app->redirect_to("/articlelist");
             }
         } elseif ($app->get_session_message("perm") >= 2) {
-            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be the author or above level 2 to delete this article.");
+            $app->set_flash("Insufficient permissions to remove article: '".$article_data->title."'<br>You need to be above level 2 to delete this article.");
             $app->redirect_to("/articlelist");
         }
     } else {
+        header("HTTP/1.0 403 Access Denied.");
         $app->render(LAYOUT, "403");
     }
 });
@@ -425,9 +425,11 @@ get("/editarticle/:id;[\d]+", function($app) {
             $app->set_csrftoken();
             $app->render(LAYOUT, "editarticle");
         } else {
+            header("HTTP/1.0 404 Not Found");
             $app->render(LAYOUT, "404");
         }
     } else {
+        header("HTTP/1.0 403 Access Denied.");
         $app->render(LAYOUT, "403");
     }
 });

@@ -38,17 +38,17 @@ class articleData {
 
 class Article extends Database {
 
-	public function registerArticle($author_id, $title, $keywords, $article_content) {
+	public function registerArticle($author_id, $title, $keywords, $article_content, $public = 0) {
     
-        if (empty($author_id) || empty($title) || empty($keywords) || empty($article_content)) {
+        if (empty($author_id) || empty($title) || empty($keywords) || empty($article_content) || empty($public)) {
             throw new Exception("Empty field");
         }
     
     
         // Set-up and execute a prepared sql statement to insert the new article into the database.
-        $sql = "INSERT INTO articles (author_id, title, keywords, content) VALUES (?, ?, ?, ?)";
+        $sql = "INSERT INTO articles (author_id, title, keywords, content, public) VALUES (?, ?, ?, ?, ?)";
         $stmt = $this->prepare($sql);
-        if ($stmt->execute(array($author_id, $title, $keywords, $article_content))) {
+        if ($stmt->execute(array($author_id, $title, $keywords, $article_content, $public))) {
             return true;
         } else {
             throw new Exception('Internal error when adding article. Please try again later.');

@@ -23,7 +23,7 @@ class AuthException extends Exception {
 class userdata {
     public string $uid, $fname, $lname, $email, $perm;
 
-    public function __construct($uid = null, $fname = null, $lname = null, $email = null, $perm = null) {
+    public function __construct($uid = "", $fname = "", $lname = "", $email = "", $perm = "") {
         $this->uid = $uid;
         $this->fname = $fname;
         $this->lname = $lname;
