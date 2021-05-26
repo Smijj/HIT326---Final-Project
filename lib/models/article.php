@@ -39,8 +39,8 @@ class articleData {
 class Article extends Database {
 
 	public function registerArticle($author_id, $title, $keywords, $article_content, $public = 0) {
-    
-        if (empty($author_id) || empty($title) || empty($keywords) || empty($article_content) || empty($public)) {
+                                                                                                // PHP treats "0" and int 0 as empty.
+        if (empty($author_id) || empty($title) || empty($keywords) || empty($article_content) || (empty($public) && $public != 0)) {
             throw new Exception("Empty field");
         }
     
