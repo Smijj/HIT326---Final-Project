@@ -10,16 +10,8 @@ class DBException extends Exception{
         parent::__construct($message, 0, null);
     }
 }
-/**
- * Exception handeling authentication errors.
- */
-class AuthException extends Exception {
-    public function __construct($message) {
-        $message = "Internal Authentication error: ".$message;
-        parent::__construct($message, 0, null);
-    }
-}
 
+/**** === Custom Classes === ****/
 class userdata {
     public string $uid, $fname, $lname, $email, $perm;
 
@@ -130,12 +122,12 @@ class User extends Database {
      * @param string $fname first name
      * @param string $lname last name
      * @param string $pwd password
-     * @param int $perm permission level
+     * @param int|string $perm permission level
      * @return void returns **true** on success and throws an **Exception** on failure.
      */
     public function registerUser($email, $fname, $lname, $pwd, $perm) {
     
-        if (empty($email) || empty($fname) || empty($lname) || empty($pwd) || empty($perm)) {
+        if (empty($email) || empty($fname) || empty($lname) || empty($pwd) || (empty($perm) && $perm != 0)) {
             throw new Exception('Empty field');
         } else if (!$this->test_pwd($pwd)) {
             throw new Exception('Password should be a minimum of 8 characters with at least one lowercase, uppercase, and special character.');
@@ -167,15 +159,17 @@ class User extends Database {
     }
     
     /**
-     * updateUser
+     * Updates the current users information. If password is set to "" (blank), password is not changed.
+     * 
+     * Throws an exception on error.
      *
-     * @param  string $email
-     * @param  string $fname
-     * @param  string $lname
-     * @param  string $pwd
+     * @param  string $email new email
+     * @param  string $fname new first name
+     * @param  string $lname new last name
+     * @param  string $pwd (optional) new password
      * @return void
      */
-    public function updateUser($email, $fname, $lname, $pwd) {
+    public function updateUser($email, $fname, $lname, $pwd = "") {
         if (empty($email) || empty($fname) || empty($lname)) {
             throw new Exception('Empty field');
         }
@@ -195,7 +189,6 @@ class User extends Database {
                     throw new Exception('Password should be a minimum of 8 characters with at least one lowercase, uppercase, and special character.');
                 }
                 // Hash password.
-                // $pwd_peppered = $this->generate_pepper_hash($pwd);
                 $pwd_hashed = password_hash($pwd, PASSWORD_DEFAULT);
                 $sql = "UPDATE users SET fname = ?, lname = ?, email = ?, pwd = ? WHERE user_id = ?";
                 $variables = array($fname, $lname, $email, $pwd_hashed, $user_id);

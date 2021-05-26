@@ -120,7 +120,19 @@ class Article extends Database {
         }
         return false;
     }
-
+    
+    /**
+     * Updates article specified with new data.
+     * 
+     * May throw DBexception.
+     *
+     * @param  mixed $id article id
+     * @param  mixed $title new article title
+     * @param  mixed $keywords new article keywords
+     * @param  mixed $article_content new article content
+     * @param  mixed $public (optional) public status
+     * @return void
+     */
     public function update_article($id, $title, $keywords, $article_content, $public = -1) {
         if (empty($title) || empty($keywords) || empty($article_content)) {
             throw new Exception("Empty field");
@@ -139,7 +151,7 @@ class Article extends Database {
         if ($stmt->execute($variables)) {
             return true;
         } else {
-            throw new Exception('Internal error when updating article. Please try again later.');
+            throw new DBException('Internal error when updating article. Please try again later.');
         }
     }
 
