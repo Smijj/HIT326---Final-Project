@@ -23,7 +23,7 @@ class articleData {
      * @param  string $name
      * @return void
      */
-    public function __construct($article_id = null, $author_id = null, $title = null, $article_content = null, $keywords = null, $date_last_edit = null, $public = null, $name = null) {
+    public function __construct($article_id = "", $author_id = "", $title = "", $article_content = "", $keywords = "", $date_last_edit = "", $public = "", $name = "") {
         $this->article_id = $article_id;
         $this->author_id = $author_id;
         $this->title = $title;
