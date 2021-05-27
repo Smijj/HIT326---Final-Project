@@ -97,7 +97,15 @@ class Mouse{
    public function get_route(){
       return $_SERVER['REQUEST_URI'];  
    }
-
+   
+   /**
+    * Registers the request route and calls teh given function if the given route matches and if valid.
+    *
+    * @param  string $route Route to check for
+    * @param  function $callback Function to call on success
+    * @param  string $method Method used by the request (as determined by the mouse->get_method function)
+    * @return mixed Returns $callback
+    */
    public static function register($route, $callback, $method) {
       if(!static::$route_found){
          $application = static::get_instance();
