@@ -22,16 +22,30 @@ class Database {
         }
     }
 
-    
-    public function prepare($sql) {
+        
+    /**
+     * Sends a perpared statement to the database with the provided SQL query, returning the PDOStatement.
+     *
+     * @param  sting $sql SQL query
+     * @return PDOStatement|false
+     */
+    public function prepare($sql):PDOStatement|false {
         try {
             return self::$conn->prepare($sql);
         } catch (PDOException $e) {
             throw new Exception("ERROR: Could not prepare the query: {$e->getMessage()}");
         }
     }
-    
-    public function query($sql) {
+        
+    /**
+     * Sends given query to the database and does not prepare it.
+     * 
+     * DO NOT USE WITH ANY UNTRUSTED DATA.
+     *
+     * @param  mixed $sql SQL query
+     * @return PDOStatement|false
+     */
+    public function query($sql): PDOStatement|false {
         try {
             return self::$conn->query($sql);
         } catch (PDOException $e) {
